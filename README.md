@@ -1,20 +1,24 @@
-# Description of Project
+# Tennis analysis
 
-We are investigating the data of professional tennis to determine who has been the most dominant male and female players of this sport in the past decade (2010-present). We also want to determine which countries are the most dominant in this sport. 
+## Description of Project
 
-# Authors' Information
+We are investigating the data of professional tennis to determine who has been the most dominant Men's Singles players of this sport in the past decade (2010-present) based off of ATP Tennis Rankings. We want to determine which countries are the most dominant in this sport. 
+
+## Authors' Information
 
 Matthew Weglicki
 
 William Cheung
 
-# Organization of Directories
+## Organization of Directories
 
-We have raw\_ data and a clean_data directory.
+We have a "raw_data" directory which downloads the raw information we need from an online repository. 
+We have a "clean_data" directory which parses and cleans the data in which we can directly use, in a csv format.
+We have a "code" directory which is where we do our analysis in R.
+We have an "images" directory which saves all the plots and images generated from our code.
+We have a "resources" directory which stores our skeleton.R file, which generates our directories.
+FInally, we have our "report" directory which stores our written analysis of our project.
 
-# Specific Insturctions
+## Additional Insturctions
 
-n/a
-
-# TennisAnalysis
-In depth analysis of Tennis Rankings and Dominant Countries
+Thank you for reading through our findings, we hope that this information is helpful!

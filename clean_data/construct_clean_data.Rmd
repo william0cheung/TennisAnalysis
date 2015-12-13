@@ -22,7 +22,7 @@ names(rankings_10) <-c("date", "rank", "playerID", "points")
 names(rankings_curr) <-c("date", "rank", "playerID", "points")
 names(players) <- c("playerID", "first", "last", "hand", "dob", "country")
 
-
+# decomposing rankings_10s into the week by week rankings for each year
 weeks_10 <- unique(grep("^2010", rankings_10$date, value = TRUE)) #just weeks for 2010
 weeks_11 <- unique(grep("^2011", rankings_10$date, value = TRUE)) #just weeks for 2011
 weeks_12 <- unique(grep("^2012", rankings_10$date, value = TRUE)) #just weeks for 2012
@@ -30,7 +30,7 @@ weeks_13 <- unique(grep("^2013", rankings_10$date, value = TRUE)) #just weeks fo
 weeks_14 <- unique(grep("^2014", rankings_10$date, value = TRUE)) #just weeks for 2014
 weeks_15 <- unique(grep("^2015", rankings_curr$date, value = TRUE)) #just weeks for 2015
 
-
+#extracting the date of the laste week of rankings for each year
 end_10 <- tail(weeks_10, n=1)
 end_11 <- tail(weeks_11, n=1)
 end_12 <- tail(weeks_12, n=1)
@@ -38,15 +38,7 @@ end_13 <- tail(weeks_13, n=1)
 end_14 <- tail(weeks_14, n=1)
 end_15 <- tail(weeks_15, n=1)
 
-first_week_2010 <- subset(rankings_10, date == weeks_10[1])
-all_week1_2010 <- merge(first_week_2010, players, by = "playerID")
-head(all_week1_2010[order(all_week1_2010$rank),], n = 100)
-
-second_week_2010 <- subset(rankings_10, date == weeks_10[2])
-all_week2_2010 <- merge(second_week_2010, players, by = "playerID")
-head(all_week2_2010[order(all_week2_2010$rank),], n = 100)
-
-#final week of 2010, all the merged data
+# final week of 2010 with relevant data to our future analysis
 last_week_2010 <- subset(rankings_10, date == weeks_10[length(weeks_10)])
 all_lastweek_2010 <- merge(last_week_2010, players, by = "playerID")
 sorted_2010 <- head(all_lastweek_2010[order(all_lastweek_2010$rank),], n = 100)
@@ -54,7 +46,7 @@ sorted_2010$date = NULL
 sorted_2010$hand = NULL
 write.csv(sorted_2010, file = "2010_top100.csv", row.names = FALSE)
 
-#final week of 2011, all the merged data
+# data of final week 2011
 last_week_2011 <- subset(rankings_10, date == weeks_11[length(weeks_11)])
 all_lastweek_2011 <- merge(last_week_2011, players, by = "playerID")
 sorted_2011 <- head(all_lastweek_2011[order(all_lastweek_2011$rank),], n = 100)
@@ -62,7 +54,7 @@ sorted_2011$date = NULL
 sorted_2011$hand = NULL
 write.csv(sorted_2011, file = "2011_top100.csv", row.names = FALSE)
 
-#final week of 2012, all the merged data
+# data of final week 2012
 last_week_2012 <- subset(rankings_10, date == weeks_12[length(weeks_12)])
 all_lastweek_2012 <- merge(last_week_2012, players, by = "playerID")
 sorted_2012 <- head(all_lastweek_2012[order(all_lastweek_2012$rank),], n = 100)
@@ -70,7 +62,7 @@ sorted_2012$date = NULL
 sorted_2012$hand = NULL
 write.csv(sorted_2012, file = "2012_top100.csv", row.names = FALSE)
 
-#final week of 2013, all the merged data
+# data of final week 2013
 last_week_2013 <- subset(rankings_10, date == weeks_13[length(weeks_13)])
 all_lastweek_2013 <- merge(last_week_2013, players, by = "playerID")
 sorted_2013 <- head(all_lastweek_2013[order(all_lastweek_2013$rank),], n = 100)
@@ -78,7 +70,7 @@ sorted_2013$date = NULL
 sorted_2013$hand = NULL
 write.csv(sorted_2013, file = "2013_top100.csv", row.names = FALSE)
 
-#final week of 2014, all the merged data
+# data of final week 2014
 last_week_2014 <- subset(rankings_10, date == weeks_14[length(weeks_14)])
 all_lastweek_2014 <- merge(last_week_2014, players, by = "playerID")
 sorted_2014 <- head(all_lastweek_2014[order(all_lastweek_2014$rank),], n = 100)
@@ -86,7 +78,7 @@ sorted_2014$date = NULL
 sorted_2014$hand = NULL
 write.csv(sorted_2014, file = "2014_top100.csv", row.names = FALSE)
 
-#final week of 2015, all the merged data
+# data of final week 2015
 last_week_2015 <- subset(rankings_curr, date == weeks_15[length(weeks_15)])
 all_lastweek_2015 <- merge(last_week_2015, players, by = "playerID")
 sorted_2015 <- head(all_lastweek_2015[order(all_lastweek_2015$rank),], n = 100)
