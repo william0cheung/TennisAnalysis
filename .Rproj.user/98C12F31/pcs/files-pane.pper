@@ -1,0 +1,9 @@
+{
+    "path" : "~/Desktop/stats133/Tennis/clean_data",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}

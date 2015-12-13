@@ -1,0 +1,17 @@
+{
+    "contents" : "\n# title: \"skeleton\"\n# author: \"Matthew Weglick William Cheung\"\n# date: \"November 18, 2015\"\n# output: creates subdirectories for the project\n\n# Also contains the commands to download raw data files to the corresponding directory\n# If we download resource files will also have commands to download to resources folder. \n\n# create raw_data directory\ndir.create(\"raw_data\")\nsetwd(\"raw_data\")\ndir.create(\"meta_data\")\nsetwd(\"../\")\n\n# create clean_data directory\ndir.create(\"clean_data\")\n\n# create code directory\ndir.create(\"code\")\n\n# create resources directory\ndir.create(\"resources\")\n\n# create report directory \ndir.create(\"report\")\nsetwd(\"report\")\nfile.create(\"tennis.Rmd\")\nsetwd(\"../\")\n\n# create images directory\ndir.create(\"images\")\n",
+    "created" : 1449099728532.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2846785431",
+    "id" : "86644C97",
+    "lastKnownWriteTime" : 1449102022,
+    "path" : "~/Desktop/stats133/Tennis/skeleton.R",
+    "project_path" : "skeleton.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "type" : "r_source"
+}
