@@ -96,22 +96,22 @@ setwd("../")
 setwd("clean_data")
 
 matches_10 <- read.csv("../raw_data/matches_10.csv")
-write.csv(subset(matches_10, tourney_level != "C" & tourney_level != "D" & tourney_level != "F", select = c(tourney_name, surface, tourney_level, match_num, winner_id, winner_name, winner_ioc, winner_age, loser_id, loser_name, loser_ioc, loser_age)), "matches_10_clean.csv", row.names = FALSE)
+write.csv(subset(matches_10, tourney_level != "C" & tourney_level != "D" & tourney_level != "F", select = c(tourney_name, surface, tourney_level, match_num, winner_id, winner_ioc)), "matches_10_clean.csv", row.names = FALSE)
 
 matches_11 <- read.csv("../raw_data/matches_11.csv")
-write.csv(subset(matches_11, tourney_level != "C" & tourney_level != "D" & tourney_level != "F", select = c(tourney_name, surface, tourney_level, match_num, winner_id, winner_name, winner_ioc, winner_age, loser_id, loser_name, loser_ioc, loser_age)), "matches_11_clean.csv", row.names = FALSE)
+write.csv(subset(matches_11, tourney_level != "C" & tourney_level != "D" & tourney_level != "F", select = c(tourney_name, surface, tourney_level, match_num, winner_id, winner_ioc)), "matches_11_clean.csv", row.names = FALSE)
 
 matches_12 <- read.csv("../raw_data/matches_12.csv")
-write.csv(subset(matches_12, tourney_level != "C" & tourney_level != "D" & tourney_level != "F", select = c(tourney_name, surface, tourney_level, match_num, winner_id, winner_name, winner_ioc, winner_age, loser_id, loser_name, loser_ioc, loser_age)), "matches_12_clean.csv", row.names = FALSE)
+write.csv(subset(matches_12, tourney_level != "C" & tourney_level != "D" & tourney_level != "F", select = c(tourney_name, surface, tourney_level, match_num, winner_id, winner_ioc)), "matches_12_clean.csv", row.names = FALSE)
 
 matches_13 <- read.csv("../raw_data/matches_13.csv")
-write.csv(subset(matches_13, tourney_level != "C" & tourney_level != "D" & tourney_level != "F", select = c(tourney_name, surface, tourney_level, match_num, winner_id, winner_name, winner_ioc, winner_age, loser_id, loser_name, loser_ioc, loser_age)), "matches_13_clean.csv", row.names = FALSE)
+write.csv(subset(matches_13, tourney_level != "C" & tourney_level != "D" & tourney_level != "F", select = c(tourney_name, surface, tourney_level, match_num, winner_id, winner_ioc)), "matches_13_clean.csv", row.names = FALSE)
 
 matches_14 <- read.csv("../raw_data/matches_14.csv")
-write.csv(subset(matches_14, tourney_level != "C" & tourney_level != "D" & tourney_level != "F", select = c(tourney_name, surface, tourney_level, match_num, winner_id, winner_name, winner_ioc, winner_age, loser_id, loser_name, loser_ioc, loser_age)), "matches_14_clean.csv", row.names = FALSE)
+write.csv(subset(matches_14, tourney_level != "C" & tourney_level != "D" & tourney_level != "F", select = c(tourney_name, surface, tourney_level, match_num, winner_id, winner_ioc)), "matches_14_clean.csv", row.names = FALSE)
 
 matches_15 <- read.csv("../raw_data/matches_15.csv")
-write.csv(subset(matches_15, tourney_level != "C" & tourney_level != "D" & tourney_level != "F", select = c(tourney_name, surface, tourney_level, match_num, winner_id, winner_name, winner_ioc, winner_age, loser_id, loser_name, loser_ioc, loser_age)), "matches_15_clean.csv", row.names = FALSE)
+write.csv(subset(matches_15, tourney_level != "C" & tourney_level != "D" & tourney_level != "F", select = c(tourney_name, surface, tourney_level, match_num, winner_id, winner_ioc)), "matches_15_clean.csv", row.names = FALSE)
 
 ```
 

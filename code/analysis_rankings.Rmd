@@ -16,7 +16,7 @@ library("readr")
 setwd("/Users/williamcheung/Desktop/stats133/Tennis/")
 setwd("./code")
 
-# read in the files
+# read in the files from clean_data
 rankings_10 <- read.csv("../clean_data/2010_top100.csv", header = TRUE)
 rankings_11 <- read.csv("../clean_data/2011_top100.csv", header = TRUE)
 rankings_12 <- read.csv("../clean_data/2012_top100.csv", header = TRUE)
