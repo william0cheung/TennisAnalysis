@@ -10,8 +10,8 @@ Use Rankings to determine depth of countries and players
 library("readr")
 
 #getwd()
-
-#setwd("./code")
+setwd("/Users/williamcheung/Desktop/stats133/Tennis/")
+setwd("./code")
 
 # read in the files
 rankings_10 <- read.csv("../clean_data/2010_top100.csv", header = TRUE)
@@ -144,7 +144,6 @@ final_before_reshape[,1]
 for (i in 1:length(rownames(final_before_reshape))) {
   percentage_100 = c(percentage_100, final_before_reshape[,1][i] / sum_top100)
 }
-percentage_100
 
 sum_top50 <- sum(final_before_reshape$top50)
 percentage_50 = c()
@@ -152,7 +151,6 @@ final_before_reshape[,2]
 for (i in 1:length(rownames(final_before_reshape))) {
   percentage_50 = c(percentage_50, final_before_reshape[,2][i] / sum_top50)
 }
-percentage_50
 
 sum_top20 <- sum(final_before_reshape$top20)
 percentage_20 = c()
@@ -160,7 +158,6 @@ final_before_reshape[,3]
 for (i in 1:length(rownames(final_before_reshape))) {
   percentage_20 = c(percentage_20, final_before_reshape[,3][i] / sum_top20)
 }
-percentage_20
 
 sum_top10 <- sum(final_before_reshape$top10)
 percentage_10 = c()
@@ -168,7 +165,6 @@ final_before_reshape[,4]
 for (i in 1:length(rownames(final_before_reshape))) {
   percentage_10 = c(percentage_10, final_before_reshape[,4][i] / sum_top10)
 }
-percentage_10
 
 
 percentage_final <- final_before_reshape
@@ -176,7 +172,6 @@ percentage_final$top100 <- percentage_100
 percentage_final$top50 <- percentage_50
 percentage_final$top20 <- percentage_20
 percentage_final$top10 <- percentage_10
-
 
 
 final_country_names <- rownames(final_before_reshape)
@@ -243,8 +238,8 @@ all_merged$Row.names <- NULL
 all_merged <- merge(all_merged, depth_freqs_15, by = 0, all.x = TRUE)
 row.names(all_merged) <- all_merged$Row.names
 all_merged$Row.names <- NULL
-all_merged
 
+# merged_before_reshape is the data.frame before a reshape
 merged_before_reshape <- all_merged
 
 country_names <- rownames(all_merged)
@@ -266,15 +261,8 @@ For every country add the points on. Average number of points per country. We wa
 # Average number of points per any country
 # this is the sum of all points / number of unique countries = averae points for a country
 # number of points of the country / # of players in that country = how good that player is
-rankings_10
-rankings_11
-rankings_12
-rankings_13
-rankings_14
-
 
 # start from rankings_15
-
 # get sum of all the points
 sum_2015_points <- sum(rankings_15$points)
 distinct_countries <- unique(rankings_15$country)
@@ -292,7 +280,6 @@ for (i in 1:length(distinct_countries)) {
   temp1 <- c(rankings_15$points[index1])
   list_points[[i]] <- temp1
 }
-list_points
 names(list_points) <- distinct_countries
 
 # get the average points for top100 players
@@ -304,90 +291,38 @@ avg_player_for_country = list()
 for (i in 1:length(list_points)) {
   avg_player_for_country[[i]] <- sum((list_points[[i]]) / length(list_points[[i]]))
 }
-avg_player_for_country
 names(avg_player_for_country) <- distinct_countries
-avg_player_for_country
 
 # compare average points for all players vs the country's average player points
-avg_player_for_country[[1]]
-avg_points_per_player
 list_difference_country_vs_avg <- list()
 for (i in 1:length(avg_player_for_country)) {
   list_difference_country_vs_avg[[i]] <- avg_player_for_country[[i]] - avg_points_per_player
 }
-list_difference_country_vs_avg
 names(list_difference_country_vs_avg) <- distinct_countries
-list_difference_country_vs_avg
 
-avg_vs_country_2015 <- data.frame(list_difference_country_vs_avg)
-colnames(avg_vs_country_2015)
-ncol(avg_vs_country_2015)
-nrow(avg_vs_country_2015)
-head(rankings_15)
-head(list_points)
+avg_vs_country_2015 <- data.frame(matrix(unlist(list_difference_country_vs_avg), 
+                                         nrow=length(list_difference_country_vs_avg), byrow=T),
+                                         row.names = distinct_countries)
+names(avg_vs_country_2015) <- "difference"
+avg_vs_country_2015
+
+country_vs_avg_2015_sorted <- avg_vs_country_2015[order(
+                              avg_vs_country_2015$difference, 
+                                                  decreasing = TRUE), 
+                                    , drop = FALSE]
+
+top_5_countries_by_avg_points <- head(country_vs_avg_2015_sorted, n = 5)
+bottom_5_countries_by_avg_points <- tail(country_vs_avg_2015_sorted, n = 5)
+
+ggplot(all_merged, aes(variable, value, group=factor(country), color = factor(country))) + geom_line(size=.75) + geom_point() + ylab("Number of Players in Top 100") + xlab("Year") + ggtitle("Evolution of Tennis Rankings") + theme(legend.title = element_text(size=12))+ scale_color_discrete(name="Country")
 
 
+t <- ggplot(top_5_countries_by_avg_points, aes(rownames(top_5_countries_by_avg_points), difference, group=factor(country), color = factor(rownames(top_5_countries_by_avg_points))))
+t + geom_bar(stat = "identity") + xlab("Country") + ylab("Average Country Points - Average Overall Player") + ggtitle("Top 5 Countries by Average Points") + theme(legend.title = element_text(size=12))+ scale_color_discrete(name="Country")
 
-
-
-
-
-```
-
-\newpage
-Extraneous
-```{r}
-# rankings_10$rank[which(rankings_10$country == rownames(depth_freqs)[1])]
-# # get average rank of those 14. avg = 37.07143
-# sum(each_best_rank) / sum(best)
-# 
-# 
-# rownames(depth_freqs)[2]
-# # For FRA, 11 players in top100, avg rank of those 11: 48.63636
-# second <-  rankings_10$country == rownames(depth_freqs)[2]
-# second
-# each_second_rank <- rankings_10$rank[which(second)]
-# each_second_rank
-# sum(each_second_rank) / sum(second)
-# 
-# 
-# rownames(depth_freqs)[3]
-# 
-# # For GER, 11 players in top100, avg rank of those 11: 62.6667
-# third <-  rankings_10$country == rownames(depth_freqs)[3]
-# third
-# each_third_rank <- rankings_10$rank[which(third)]
-# each_third_rank
-# sum(each_third_rank) / sum(third)
-# 
-# 
-# rownames(depth_freqs)[4]
-# # For ARG, 7 players in top100, avg rank of those 7: 58.57143
-# fourth <-  rankings_10$country == rownames(depth_freqs)[4]
-# fourth
-# each_fourth_rank <- rankings_10$rank[which(fourth)]
-# each_fourth_rank
-# sum(each_fourth_rank) / sum(fourth)
-# 
-# rownames(depth_freqs)[5]
-# # For ARG, 5 players in top100, avg rank of those 5: 58.2
-# fifth <-  rankings_10$country == rownames(depth_freqs)[5]
-# fifth
-# each_fifth_rank <- rankings_10$rank[which(fifth)]
-# each_fifth_rank
-# sum(each_fifth_rank) / sum(fifth)
-# 
-# rownames(depth_freqs)[6]
-# # For USA, 5 players in top100, avg rank of those 5: 32
-# sixth <-  rankings_10$country == rownames(depth_freqs)[6]
-# sixth
-# each_sixth_rank <- rankings_10$rank[which(sixth)]
-# each_sixth_rank
-# sum(each_sixth_rank) / sum(sixth)
-# 
-# 
-# 
-# 
+bottom_5_countries_by_avg_points
+# b <- ggplot(bottom_5_countries_by_avg_points, aes(rownames(bottom_5_countries_by_avg_points), difference, group=factor(country), color = factor(rownames(bottom_5_countries_by_avg_points))))
+# b + geom_bar(stat = "identity", position = "identity") + xlab("Country") + ylab("Average Country Points - Average Overall Player") + ggtitle("Bottom 5 Countries by Average Points") + theme(legend.title = element_text(size=12))+ scale_color_discrete(name="Country")
 
 ```
 

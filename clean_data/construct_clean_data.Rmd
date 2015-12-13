@@ -86,10 +86,10 @@ sorted_2014$date = NULL
 sorted_2014$hand = NULL
 write.csv(sorted_2014, file = "2014_top100.csv", row.names = FALSE)
 
-#final week of 2014, all the merged data
-last_week_2015 <- subset(rankings_10, date == weeks_14[length(weeks_15)])
+#final week of 2015, all the merged data
+last_week_2015 <- subset(rankings_curr, date == weeks_15[length(weeks_15)])
 all_lastweek_2015 <- merge(last_week_2015, players, by = "playerID")
-sorted_2015 <- head(all_lastweek_2015[order(all_lastweek_2014$rank),], n = 100)
+sorted_2015 <- head(all_lastweek_2015[order(all_lastweek_2015$rank),], n = 100)
 sorted_2015$date = NULL
 sorted_2015$hand = NULL
 write.csv(sorted_2015, file = "2015_top100.csv", row.names = FALSE)
