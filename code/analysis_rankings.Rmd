@@ -261,12 +261,70 @@ ggplot(all_merged, aes(variable, value, group=factor(country), color = factor(co
 
 
 \newpage
-For every country add the points on. Average number of points per country. We want to find out how good the average player is.
+For every country add the points on. Average number of points per country. We want to find out how good the average player is. How much a player contributes on average
 ```{r}
 # Average number of points per any country
 # this is the sum of all points / number of unique countries = averae points for a country
 # number of points of the country / # of players in that country = how good that player is
+rankings_10
+rankings_11
+rankings_12
+rankings_13
+rankings_14
 
+
+# start from rankings_15
+
+# get sum of all the points
+sum_2015_points <- sum(rankings_15$points)
+distinct_countries <- unique(rankings_15$country)
+avg_points_per_country <- sum_2015_points / length(distinct_countries)
+
+# make data frame with points and country
+country_points <- data.frame(rankings_15$points, rankings_15$country)
+names(country_points) <- c("points", "country")
+nrow(country_points[unique(rankings_15$country),])
+
+# create list of country and points
+list_points <- c()
+for (i in 1:length(distinct_countries)) {
+  index1 <- which(country_points$country == distinct_countries[i])
+  temp1 <- c(rankings_15$points[index1])
+  list_points[[i]] <- temp1
+}
+list_points
+names(list_points) <- distinct_countries
+
+# get the average points for top100 players
+avg_points_per_player <- sum_2015_points / nrow(rankings_15)
+avg_points_per_player
+
+# get avergae points for a country's players
+avg_player_for_country = list()
+for (i in 1:length(list_points)) {
+  avg_player_for_country[[i]] <- sum((list_points[[i]]) / length(list_points[[i]]))
+}
+avg_player_for_country
+names(avg_player_for_country) <- distinct_countries
+avg_player_for_country
+
+# compare average points for all players vs the country's average player points
+avg_player_for_country[[1]]
+avg_points_per_player
+list_difference_country_vs_avg <- list()
+for (i in 1:length(avg_player_for_country)) {
+  list_difference_country_vs_avg[[i]] <- avg_player_for_country[[i]] - avg_points_per_player
+}
+list_difference_country_vs_avg
+names(list_difference_country_vs_avg) <- distinct_countries
+list_difference_country_vs_avg
+
+avg_vs_country_2015 <- data.frame(list_difference_country_vs_avg)
+colnames(avg_vs_country_2015)
+ncol(avg_vs_country_2015)
+nrow(avg_vs_country_2015)
+head(rankings_15)
+head(list_points)
 
 
 
