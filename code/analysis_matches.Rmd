@@ -12,8 +12,8 @@ Using our clean data, we will now go on to investigate the dominance of certain 
 First we must create the functions which when given the match statistics from certain years, are able to extract those matches which were "title matches", where the winner won the entire tournament, and output the winning nationalities, surface, and level of each tournament in that year. We will import the "reader" library to read in the data from our "clean_data."
 
 ```{r, eval=TRUE, tidy=TRUE}
-
-setwd("../code")
+# Assume we are in the Tennis Project Directory
+setwd("./code")
 
 library("readr")
 

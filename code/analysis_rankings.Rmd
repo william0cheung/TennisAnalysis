@@ -16,7 +16,8 @@ We will import the "reader" library to read in the data from our "clean_data." W
 
 ```{r, eval=TRUE, warning= FALSE, message= FALSE}
 library("readr")
-setwd("../code")
+# Assume we are in the Tennis Project Directory
+setwd("./code")
 
 # read in the files from clean_data
 rankings_10 <- read.csv("../clean_data/2010_top100.csv", header = TRUE)

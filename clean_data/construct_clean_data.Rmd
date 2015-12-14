@@ -7,8 +7,8 @@ output: pdf_document
 
 ```{r}
 library("readr")
-
-setwd("../clean_data")
+# Assume we are in the Tennis Project Directory
+setwd("./clean_data")
 
 # reading in the files
 rankings_10 <- read.csv("../raw_data/rankings_10.csv", header = FALSE)

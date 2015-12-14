@@ -9,6 +9,7 @@
 # Note: There is also a directory called "TennisAnalysis." 
 # This was created as a GitHub repository. Here is the link: https://github.com/william0cheung/TennisAnalysis 
 
+# Assume we are in the Tennis Project Directory
 # create raw_data directory
 dir.create("raw_data")
 setwd("raw_data")
