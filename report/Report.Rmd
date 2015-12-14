@@ -1,0 +1,733 @@
+---
+title: "Stats 133 Final Project Report"
+author: " William Cheung & Matthew Weglicki"
+date: "Due December 14, 2015"
+output: pdf_document
+---
+#Introduction
+
+Tennis is one of the most popular sports in the world, drawing in billions of viewers every year, and so the amount of statistics available on the sport is appropriately plentiful. Thus, our undertaking in this project is going to be analyze the performance of individual countries since 2010 in the sport's most popular event - men's singles. In particular, the question we want to answer is, are there any countries which have dominated the sport in men's singles since the turn of this decade, and if so who are they? We have taken a two prong approach to analyzing "dominance" - analyzing both year-end ranking statistics, and comprehensive match statistics since 2010.
+
+In terms of rankings, we set a standard of only considering the top 100 players in the world in a given year and proceeded to investigated three aspects of the rankings which we thought would effectively reflect dominance. First of all we investigated how much representation each nation had in the top 100, top 50, top 20, and top 10, in order to analyze the depth of quality that each nation had. In other words to provide a much more probing analysis by seeing whether dominant nations had strong representations in all positions within the rankings and to expose countries who on an absolute scale might seem to be "dominant"  within the top 100, but in fact have 9 out of 10 of their players ranked below position 90, for example. Secondly, we looked at the evolution of top 100 rankings over the years, to see which countries have consistently had strong representation, and which might have appeared to be dominant only for brief amounts of time. Lastly, we used the ranking points of the top 100 players to measure the average number of points each country had per player in the top 100, and used that as a proxy for how good the average player in each country is, which allowed for further interesting comparisons.
+
+The second criteria we used to determine which countries were most dominant were match statistics of every single match played since 2010. Since individual match wins are accounted for in the ranking points, we used the total number of titles each country has won since 2010 as the measure of success in this category. Tennis is also a discipline which is played on three different court surfaces - Clay, Grass, and Hard - as well as having three different "levels" of tournaments on the professional tour - ATP, Masters, and Grandslam. The level of each tournament is indicated by the amount of points it offers in each round of the tournament, with Grandslams offering the most points to participants (and hence being the highest level of play), followed by Masters events, and then ATP tournaments offering the least amount of points on the tennis pro tour. With this in mind it seemed appropriate to offer sub-questions of whether the dominant nations in tennis had a particular affinity to certain surfaces and what how their performance changes depending on the level of the tournament. This was achieved by examining how many of the total titles that a country won were from a particular surface and level.
+
+##Data Extraction and Cleaning
+
+We were very fortunate in that we chose a topic which did not have a lack of data. The source of our data was Jack Sackmann's (a professional sports analyst) public GitHub repository, found at https://github.com/JeffSackmann/tennis_atp. 
+There we found raw data containing comprehensive men's singles rankings and match statistics for the years 2010 - 2015 (his larger tennis repository dated back to rankings and statistics for both men and women's singles back to 1968!). All of the data collected, although bountiful, was very messy, at times cryptic and required significant manipulation to be transformed into the "clean" data we could use. For example, the match statistics for each year contained well over 2000 entries, over 49 different columns, being so detailed as to include the handedness and serving percentages of each player involved in the match. The extraction and cleaning of this particular data was simply achieved by downloading the raw data into the appropriate raw data folder via the download.file() function in R and then creating a new csv file in our clean data folder via the write.csv() function, selecting only the columns applicable to our analysis (tourney name, surface, tourney level, match num, winner id, winner ioc). At this stage we excluded tournaments of inappropriate level that shouldn't have made it into the raw data (Challenger tournaments), and exclusive tournaments where gauging a nation's strength relative to all other countries is difficult to analyze (Davis Cup and Tour Finals). Other things to note are that during the downloading of data, warning messages popped up indicating that there were some problems. Upon inspection this was due to a large number of "NAs" showing up in the latter, very specific categories of the data, categories which were superfluous to our needs and hence did not affect our analysis. The rankings raw data was much more awkward to manipulate. The rankings were given on a weekly basis of over 1000 players involved in the professional tennis tour, and to add to the complication the rankings for 2010-2014 were in the same file and did not have the names or nation representations included. They only included the week of the ranking, ranking number, player id and ranking points. Thus cleaning involved selecting only the top 100 players for the very last week of rankings for each year, and creating separate dataframes for the years 2010-2014. Once that was achieved we matched the player_id of everyone in the top 100 rankings with their ID found in the players.csv file from the same GitHub repository and so imported the names and countries of each player into our rankings data. 
+
+##Data Manipulation and Processing
+
+### Match Statistics Processing
+For the match statistics analysis, the main task was converting data on every match played in a given year, to matches which represented the finals of tournaments, and hence could be representative of how many titles a certain country won. The process for doing so began with first creating the functions which when given the match statistics from certain years, are able to extract those matches which were "title matches", where the winner won the entire tournament, and output the winning nationalities, surface, and level of each tournament in that year. The we move onto applying those functions in order to create dataframes for each year containing information about the winning nationality, surface and level of each tournament in that year. We then consolidate all these dataframes into one comprehensive dataframe, from which we will be able to conduct our appropriate analysis.
+
+### Rankings Processing
+For the rankings analysis, we start with the clean data which includes the top 100 players with their ID, rank, points, date of birth, and country. From this we will most closely use rank, points, and country. For this rankings analysis, we wanted to analyze a country’s depth, meaning if they have produced multiple top players, or if the country only has really one or two top players only. We break it down into three parts.  
+For the first part, we looked at the rankings from 2015 and created a mapping using a list, where each item of the list is a country, then its elements are the ranking of their players in the top 100. For the second part, we wanted to track the evolution of the rankings between 2010 to 2015. Based off the top 100 rankings for those years, we could count how many of players those countries had in the top 100. Then, with the different years, we can see how consistent those country’s players performed. For the third part, we use the number of points each player received for playing and winning tournaments. We can use this to determine the average number points a player in the top 100 accumulated, and then compare this average to the players from each country. This is to determine which country produces players in comparison to the average. Therefore, we can determine the top countries by the points accumulated. 
+
+
+##Data Analysis
+
+### Match Analysis
+From the match analysis first of all we see that in the 2010-2015 period a total of 32 different countries have won titles. However, an overwhelming large proportions of titles have gone to the top 10 nations as is demonstrated by the organised list of countries with their appropriate number of titles below.  
+```{r, eval=TRUE, tidy=TRUE, echo=FALSE}
+setwd("../report")
+
+library("readr")
+matches_10 <- read_csv("../clean_data/matches_10_clean.csv")
+matches_11 <- read_csv("../clean_data/matches_11_clean.csv")
+matches_12 <- read_csv("../clean_data/matches_12_clean.csv")
+# exclude an entry from data which was repetitive and hence placed a bug in the analysis later on
+matches_12 <- matches_12[-2656, ]
+matches_13 <- read_csv("../clean_data/matches_13_clean.csv")
+matches_14 <- read_csv("../clean_data/matches_14_clean.csv")
+matches_15 <- read_csv("../clean_data/matches_15_clean.csv")
+
+
+# function which produces unique number of tournaments for a given year
+uniq_tour <- function(tour_year) {
+return(unique(tour_year$tourney_name))
+}
+
+# function when given a name or list of names of tournaments and a given year will output the total number of matches in the tournament(s), hence allows you to find the index of the final match of the tournament
+tour_num_matches <- function(tour_names, tour_year) { num_matches <- numeric(0) 
+for (i in tour_names) { 
+  num_matches <- c(num_matches, as.numeric(sum(tour_year$tourney_name == i)))
+} 
+return(num_matches)
+}
+
+# function that when given tour_year, uniq_tour and total matches in each tournament, returns the ioc of the title winner
+title_winner_ioc <- function(tour_year, tour_names, total_matches) {
+  ioc_list <- character(0)
+  for (i in 1:length(tour_names)) {
+    ioc_list <- c(ioc_list, tour_year[tour_year$tourney_name == tour_names[i] & tour_year$match_num == total_matches[i], 6])
+  }
+  return(ioc_list)
+}
+
+# function that combines all of the above ie given a match year, it just displays a list of the countries that won the tournaments in a given year
+title_winning_iocs <- function(tour_year) {
+  tour_names <- uniq_tour(tour_year)
+  total_matches <- tour_num_matches(tour_names, tour_year)
+  iocs <- title_winner_ioc(tour_year, tour_names, total_matches)
+  return(iocs)
+}
+
+
+#last two functions for surface and tourney level
+#surface
+title_winner_surface <- function(tour_year, tour_names, total_matches) {
+  surface_list <- character(0)
+  for (i in 1:length(tour_names)) {
+    surface_list <- c(surface_list, tour_year[tour_year$tourney_name == tour_names[i] & tour_year$match_num == total_matches[i], 2])
+  }
+  return(surface_list)
+}
+
+title_winning_surfaces <- function(tour_year) {
+  tour_names <- uniq_tour(tour_year)
+  total_matches <- tour_num_matches(tour_names, tour_year)
+  surfaces <- title_winner_surface(tour_year, tour_names, total_matches)
+  return(surfaces)
+}
+
+#tourney_level
+title_winner_level <- function(tour_year, tour_names, total_matches) {
+  level_list <- character(0)
+  for (i in 1:length(tour_names)) {
+    level_list <- c(level_list, tour_year[tour_year$tourney_name == tour_names[i] & tour_year$match_num == total_matches[i], 3])
+  }
+  return(level_list)
+}
+
+title_winning_levels <- function(tour_year) {
+  tour_names <- uniq_tour(tour_year)
+  total_matches <- tour_num_matches(tour_names, tour_year)
+  levels <- title_winner_level(tour_year, tour_names, total_matches)
+  return(levels)
+}
+
+```
+
+```{r, eval=TRUE, echo=FALSE}
+# create a dataframe for each year with the information in the above description  
+df_2010 <- data.frame(
+  tournament_name = uniq_tour(matches_10),
+  winner_ioc = title_winning_iocs(matches_10),
+  winning_surface = title_winning_surfaces(matches_10),
+  winning_level = title_winning_levels(matches_10),
+  year = 2010
+)
+
+
+df_2011 <- data.frame(
+  tournament_name = uniq_tour(matches_11),
+  winner_ioc = title_winning_iocs(matches_11),
+  winning_surface = title_winning_surfaces(matches_11),
+  winning_level = title_winning_levels(matches_11),
+  year = 2011
+)
+
+df_2012 <- data.frame(
+  tournament_name = uniq_tour(matches_12),
+  winner_ioc = title_winning_iocs(matches_12),
+  winning_surface = title_winning_surfaces(matches_12),
+  winning_level = title_winning_levels(matches_12),
+  year = 2012
+)
+
+df_2013 <- data.frame(
+  tournament_name = uniq_tour(matches_13),
+  winner_ioc = title_winning_iocs(matches_13),
+  winning_surface = title_winning_surfaces(matches_13),
+  winning_level = title_winning_levels(matches_13),
+  year = 2013
+)
+
+df_2014 <- data.frame(
+  tournament_name = uniq_tour(matches_14),
+  winner_ioc = title_winning_iocs(matches_14),
+  winning_surface = title_winning_surfaces(matches_14),
+  winning_level = title_winning_levels(matches_14),
+  year = 2014
+)
+
+df_2015 <- data.frame(
+  tournament_name = uniq_tour(matches_15),
+  winner_ioc = title_winning_iocs(matches_15),
+  winning_surface = title_winning_surfaces(matches_15),
+  winning_level = title_winning_levels(matches_15),
+  year = 2015
+)
+
+# create a master dataframe of all of the above data
+master_df <- merge(df_2010, df_2011, all = TRUE)
+master_df <- merge(master_df, df_2012, all = TRUE)
+master_df <- merge(master_df, df_2013, all = TRUE)
+master_df <- merge(master_df, df_2014, all = TRUE)
+master_df <- merge(master_df, df_2015, all = TRUE)
+
+```
+
+
+```{r, eval=TRUE, tidy=TRUE, echo=FALSE}
+# list of countries that have won titles since 2010
+winner_ioc_list <- unique(master_df$winner_ioc)
+
+
+# vector of total titles by country with names
+titles_by_ioc <- numeric(0)
+for (i in winner_ioc_list) {
+  titles_by_ioc <- c(titles_by_ioc, sum(master_df$winner_ioc == i))
+}
+names(titles_by_ioc) <- winner_ioc_list[1:32]
+
+# order the vector
+ordered_titles_by_ioc <- sort(titles_by_ioc, decreasing = TRUE)
+ordered_titles_by_ioc
+
+```
+
+
+
+Furthermore, we see Spain in particular has been very dominant in the sport during this time, obtaining almost twice as many titles as Serbia in second place, as demonstrated in the barplot below. After Spain however, there is a group of countries bunched together, with not much separating them, especially when you consider this is over the course of six years.  
+```{r, eval=TRUE, tidy=TRUE, echo=FALSE}
+
+# top 5 countries in terms of titles
+top5 <- ordered_titles_by_ioc[1:5]
+top5_names <- names(top5)
+
+# construct barplot in terms of top 5 title winning countries
+barplot(top5, xpd = F, axes = F, main = "Total number of titles by top 5 countries", xlab = "Country", ylim = c(0, 100), ylab = "Total number of titles")
+axis(side = 2, at = seq(from = 0, to = 100, by = 20), tick = TRUE, las = 2)
+
+
+```
+
+
+
+
+Next we can evaluate that once within this exclusive group of top 5 countries whether any of them have been performing particularly well on certain court surfaces by first of all looking at the decomposition of the top 5 countries' titles by surface in table form, and then analyzing another barplot of the data. 
+```{r, eval=TRUE, tidy=TRUE, echo=FALSE}
+# number of titles each country wins on each surface
+clay_wins_list <- numeric(0)
+for (i in winner_ioc_list) 
+  {clay_wins_list <- c(clay_wins_list, sum(master_df$winner_ioc == i & master_df$winning_surface == 'Clay'))
+}
+
+grass_wins_list <- numeric(0)
+for (i in winner_ioc_list) {
+  grass_wins_list <- c(grass_wins_list, sum(master_df$winner_ioc == i & master_df$winning_surface == 'Grass'))
+}
+
+hard_wins_list <- numeric(0)
+for (i in winner_ioc_list) {
+  hard_wins_list <- c(hard_wins_list, sum(master_df$winner_ioc == i & master_df$winning_surface == 'Hard'))
+}
+
+
+surface_df <- data.frame(
+  country = winner_ioc_list,
+  Clay = clay_wins_list,
+  Grass = grass_wins_list,
+  Hard = hard_wins_list
+)
+
+# extracting indices required to obtain the top 5 countries from above for a comparison
+row_indices_top5 <- c(which(surface_df$country == 'ESP'), which(surface_df$country == 'SRB'), which(surface_df$country == 'SUI'), which(surface_df$country == 'FRA'), which(surface_df$country == 'USA'))
+
+top5_surfaces <- surface_df[row_indices_top5, ]
+top5_surfaces
+
+# plot surfaces information for comparison
+barplot(height = t(as.matrix(top5_surfaces[, 2:4])), names.arg = (top5_names), xpd = F, 
+        main = "Top 5 country titles by surfaces",
+        xlab = "Country", ylab = "Number of titles",
+        ylim = c(0, 100), axes = F, 
+        col = c(rgb(1, 0 , 0), rgb(0, 1, 0), rgb(0,0, 1)), 
+        legend = colnames(top5_surfaces)[-1])
+axis(side = 2, at = seq(from = 0, to = 100, by = 20), tick = TRUE, las = 2)
+
+```
+
+
+Overall, the general trend within this data is that most of the top five countries have won most of their titles on hard courts, followed by clay courts, and least of all on grass courts. This is unsurprising given that the distribution of matches palyed on surfaces follows that exact trend - most matches are played on hard, followed by clay, and least on grass throughout the tennis season. The major buck in this trend however is in the case of Spain, who have won a staggering 58 out of 86 titles on clay. Coupling this with the fact that clay court is not the most played on surface during the tennis season seems to highlight that Spain's affinity to clay courts has played a very significant role in its dominance, in terms of total titles won, of men's singles since 2010. Other trends to note are that Serbia appears to have a particularly high success rate on hard courts, winning 76% of its titles on the surface, and that relative to how little time is allocated to grass courts during the season (about 6 weeks of the year), the USA appears to favor the surface significantly over clay courts. 
+
+
+Lastly for match analysis it is time to see how the top 5 countries perform at varying levels of the game. Whether certain countries shine when it really matters, and whether others perform better when there is less pressure. Below are once again the total titles won by each of the top 5 countries, this time separated by the level. Once again this is presented in table for first and then with a graphical representation of the data.
+```{r, eval=TRUE, tidy=TRUE, echo=FALSE}
+# number titles each country wins per level
+
+# construct a dataframe of levels
+A_wins_list <- numeric(0)
+for (i in winner_ioc_list) {
+  A_wins_list <- c(A_wins_list, sum(master_df$winner_ioc == i & master_df$winning_level == 'A'))
+}
+
+
+G_wins_list <- numeric(0)
+for (i in winner_ioc_list) {
+  G_wins_list <- c(G_wins_list, sum(master_df$winner_ioc == i & master_df$winning_level == 'G'))
+}
+
+
+M_wins_list <- numeric(0)
+for (i in winner_ioc_list) {
+  M_wins_list <- c(M_wins_list, sum(master_df$winner_ioc == i & master_df$winning_level == 'M'))
+}
+
+level_df <- data.frame(
+  country = winner_ioc_list,
+  ATP = A_wins_list,
+  Grandslams = G_wins_list,
+  Masters = M_wins_list
+)
+
+# extract our top 5 countries from earlier for further comparison
+top5_levels <- level_df[row_indices_top5, ]
+top5_levels
+
+# plot for visual comparison
+barplot(height = t(as.matrix(top5_levels[, 2:4])), names.arg = (top5_names), xpd = F, 
+        main = "Top 5 country titles by level", 
+        xlab = "Country", ylab = "Number of titles",
+        ylim = c(0, 70), axes = F, 
+        col = c(rgb(0.8,0.5,0.2), rgb(1, 0.85, 0), rgb(0.75, 0.75, 0.75)), 
+        legend = colnames(top5_levels)[-1], beside = TRUE)
+axis(side = 2, at = seq(from = 0, to = 70, by = 10), tick = TRUE, las = 2)
+
+
+
+```
+
+  
+The overall trend that can be deduced from this data is such that for most countries, the majority of their titles come from lower level tournaments (ATPs), which is unsurprising, as once again the make up the vast majority (60%) of the tennis annual tour. There are several other things to point out about this data. First of all there appears to be a division of quality between the top 3 and France and the USA. This analysis comes from the fact that although France and the US are still close to total number of titles of Switzerland and Serbia, neither of the bottom two appear to perform particularly well on large occasions, with neither winning any Grandslams, and aminiscule amount of Masters titles. Secondly, although Spain appears to have an overwhelmingly large number of ATP titles compared tot the other countries, it is not so dominant when it comes to higher level Masters and Grandslam events. Lastly, it is apparent that Serbia performs well under pressure, having won the majority of its titles not in ATP events (despite that making up most of the tour), and having the greatest number of Grandslams of all the nations in the top 5. What can be drawn from this analysis is that when it comes to the big occasions, Serbia is most certainly the dominant nation, Spain still puts up very respectable performances at the big events, but dominates the lower ATP events (winning over 40% of all those tournaments since 2010), whereas France and the USA are nations which do significantly better when the stakes are lower. In terms of segregation by level, Switzerland follows a very typical trend - seeing a steady decrease in the number of titles as the level of the tournament increases.   
+
+
+### Rankings Analysis
+
+We will use the Tennis ATP Rankings from 2015 to determine the competitive depth of a country's tennis representation. First we will read in the data from clean_data directory. We want the top 100 players from each year, and their corresponding country they represent. We have three parts to this analysis. 
+
+Part I was accomplished by manipulating our data first into a table and then into a data frame.
+First we defined depth as a country with more than one player in the top 100. This means the country has more than one representative in the top 100. Then we went even more specific to look at the top 50, top20 and top10. The following table represents each country and the amount of players in each category for 2015. The amount of countries shown is filtered by having at least 2 players represnted in the top 100.
+
+```{r, eval=TRUE, warning= FALSE, message= FALSE, echo = FALSE}
+library("readr")
+# Assume we are in the Tennis Project Directory
+
+# read in the files from clean_data
+rankings_10 <- read.csv("../clean_data/2010_top100.csv", header = TRUE)
+rankings_11 <- read.csv("../clean_data/2011_top100.csv", header = TRUE)
+rankings_12 <- read.csv("../clean_data/2012_top100.csv", header = TRUE)
+rankings_13 <- read.csv("../clean_data/2013_top100.csv", header = TRUE)
+rankings_14 <- read.csv("../clean_data/2014_top100.csv", header = TRUE)
+rankings_15 <- read.csv("../clean_data/2015_top100.csv", header = TRUE)
+
+# Sorted frequencies of countries with > 1 player in the top 100 for 2010
+country_freqs <- sort(table(rankings_15$country), decreasing = TRUE)
+depth_freqs <- as.data.frame(country_freqs)
+depth_freqs <- as.data.frame(depth_freqs[!(depth_freqs$country_freqs == 1),])
+colnames(depth_freqs) <- "Num_Players"
+
+
+# function to find top50
+top50 <- function(vect) {
+  if (vect <= 50) return (TRUE) else return (FALSE)
+}
+top50 = Vectorize(top50)
+
+# function to find top20
+top20 <- function(vect) {
+  if (vect <= 20) return (TRUE) else return (FALSE)
+}
+top20 = Vectorize(top20)
+
+# function to find top10
+top10 <- function(vect) {
+  if (vect <= 10) return (TRUE) else return (FALSE)
+}
+top10 = Vectorize(top10)
+```
+
+```{r, eval=TRUE, echo = FALSE, warning= FALSE, message= FALSE}
+library(reshape2)
+library(ggplot2)
+
+# Create a list, map the country with index of player ranking from 2010.
+country_vec <- c()
+list_top100 <- list()
+for (i in 1:nrow(depth_freqs)) {
+  country_vec <- c(country_vec, rownames(depth_freqs)[i])
+  index <- which(rankings_15$country == rownames(depth_freqs)[i])
+  temp <- c(rankings_15$rank[index])
+  list_top100[[i]] <- temp
+}
+
+# Create a list and map the country with ranking index in the top 50.
+list_top50 <- list()
+for (i in 1:nrow(depth_freqs)) {
+  list_top50[[i]] <- list_top100[[i]][top50(list_top100[[i]])]
+}
+
+# Create a list and map the country with ranking index in the top 20.
+list_top20 <- list()
+for (i in 1:nrow(depth_freqs)) {
+  list_top20[[i]] <- list_top100[[i]][top20(list_top100[[i]])]
+}
+
+# Create a list and map the country with ranking index in the top 10.
+list_top10 <- list()
+for (i in 1:nrow(depth_freqs)) {
+  list_top10[[i]] <- list_top100[[i]][top10(list_top100[[i]])]
+}
+
+# Helper function to map names of countries to respective numbers.
+prepare <- function(input_freqs) {
+  country_stats <- list()
+  for (i in 1:nrow(input_freqs)) {
+    country_stats[[i]] <- c(length(list_top100[[i]]), 
+                            length(list_top50[[i]]),
+                            length(list_top20[[i]]), 
+                            length(list_top10[[i]]))
+  }
+  names(country_stats) = country_vec
+  return (country_stats)
+}
+# Create list of countries and player freqeuncy in top 100, 50, 20, 10
+list_of_freqs <- prepare(depth_freqs)
+countries <- names(list_of_freqs)
+
+# Create vectors of each country's frequency of top 100, 50, 20, 10
+all_100 <- c()
+all_50 <- c()
+all_20 <- c()
+all_10 <- c()
+for (country in 1:length(list_of_freqs)) {
+  all_100 <- c(all_100, list_of_freqs[[country]][1])
+  all_50 <- c(all_50, list_of_freqs[[country]][2])
+  all_20 <- c(all_20, list_of_freqs[[country]][3])
+  all_10 <- c(all_10, list_of_freqs[[country]][4])
+}
+
+```
+
+```{r, eval=TRUE, echo = FALSE , warning= FALSE, message= FALSE}
+# Create data frame of countries with respective number 
+# of players in the top 100, 50, 20 and 10.
+final <- data.frame(top100 = all_100, 
+                    top50 = all_50, 
+                    top20 = all_20, 
+                    top10 = all_10)
+rownames(final) <- countries
+final
+```
+
+We created basic bar plots to visualize these categories individually. We will only show top 100 bar graph for this writeup, since these graphs were intermediate for further analysis. Please see /code/analysis_rankings.Rmd for further details of these graphs.  
+
+```{r, eval=TRUE, echo=FALSE, warning= FALSE, message= FALSE, tidy=TRUE}
+# Create barplots of the top 100, 50, 20, and 10 for each country.
+rainbow_16 <-rainbow(n=16, s = 1, v = 1, 
+                     start = 0, end = max(1, 16 - 1)/16, 
+                     alpha = 1)
+
+
+pdf("../images/top_100_2015.pdf")
+a<-dev.cur()
+png("../images/top_100_2015.png")
+dev.control("enable")
+top100_bar <- barplot(final$top100, names.arg = rownames(final), 
+                      ylab = "Number of Players", 
+                      xlab = "Country", las = 2, 
+                      col = rainbow_16, 
+                      main = "Top 100 for 2015 by Country")
+abline(h = seq(from = 0, to = 14, by = 2), col = ' gray')
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
+
+```
+
+
+After viewing the top 100, 50, 20, and 10 in 2010 by country on their own, we will now see if there is a difference in depth by tracking how many players were in the top 100, 50, 20, and 10 per each country together. We will do this by raw number of players, then percentage of players in that respective category. We use ggplot to combine all these findings and figure out the dominant counties.  
+
+```{r, eval=TRUE, echo=FALSE, warning= FALSE, message=FALSE}
+final_country_names <- rownames(final)
+final_before_reshape <- final
+
+# Reshape the data frame in preparation for ggplot
+final <- melt(final)
+final$country <- final_country_names
+
+# Plot Country's Depth for 2015
+pdf("../images/country_depth_2015.pdf")
+a<-dev.cur()
+png("../images/country_depth_2015.png")
+dev.control("enable")
+ggplot(final, aes(variable, value, group=factor(country), 
+                  color = factor(country))) + 
+        geom_line(size=.75) + geom_point() + 
+        ylab("Number of Players") + xlab("Category") + 
+        ggtitle("2015 Country Depth") + 
+        theme(legend.title = element_text(size=16, face="bold")) +
+        scale_color_discrete(name="Country")
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
+
+
+# Now Plot the percentage of players in each category.
+sum_top100 <- sum(final_before_reshape$top100)
+percentage_100 = c()
+for (i in 1:length(rownames(final_before_reshape))) {
+  percentage_100 = c(percentage_100, 
+                     final_before_reshape[,1][i] / sum_top100)
+}
+```
+
+Not only did we find the raw number of players in each category, but we can try to see the weight of each country in the category as well, so we used percentage of players in the groups.  
+
+```{r, eval=TRUE, echo=FALSE, warning= FALSE, message=FALSE}
+
+# Calculate percentages
+sum_top50 <- sum(final_before_reshape$top50)
+percentage_50 = c()
+for (i in 1:length(rownames(final_before_reshape))) {
+  percentage_50 = c(percentage_50, 
+                    final_before_reshape[,2][i] / sum_top50)
+}
+
+sum_top20 <- sum(final_before_reshape$top20)
+percentage_20 = c()
+for (i in 1:length(rownames(final_before_reshape))) {
+  percentage_20 = c(percentage_20, 
+                    final_before_reshape[,3][i] / sum_top20)
+}
+
+sum_top10 <- sum(final_before_reshape$top10)
+percentage_10 = c()
+for (i in 1:length(rownames(final_before_reshape))) {
+  percentage_10 = c(percentage_10, 
+                    final_before_reshape[,4][i] / sum_top10)
+}
+
+percentage_final <- final_before_reshape
+percentage_final$top100 <- percentage_100
+percentage_final$top50 <- percentage_50
+percentage_final$top20 <- percentage_20
+percentage_final$top10 <- percentage_10
+
+final_country_names <- rownames(final_before_reshape)
+p_final_before_reshape <- percentage_final
+percentage_final <- melt(percentage_final)
+percentage_final$country <- final_country_names
+
+# Plot the Country's Depth in 2015 by Percentage
+pdf("../images/country_percentage_2015.pdf")
+a<-dev.cur()
+png("../images/country_percentage_2015.png")
+dev.control("enable")
+ggplot(percentage_final, aes(variable, value, group=factor(country), 
+                             color = factor(country))) + 
+    geom_line(size=.75) + geom_point() +
+    ylab("Percentage of Players in Respective Category") +
+    xlab("Category") +
+    ggtitle("2015 Country Depth by Percentage") +
+    theme(legend.title = element_text(size=16, face="bold")) +
+    scale_color_discrete(name="Country")
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
+```
+
+From Part I, we can look at our graph “2015 Country Depth” and see that Spain (ESP) was the most dominant, akin the most players in the top 100, and held consistently even in with 2 players in the top 10. Also, France (FRA) had a strong showing, with 10 players in the top 100 and most players (4) in the top 20, and a tied for most players in the top 10 as well. Another thing to note is that Switzerland (SUI) has only 2 players in the top 100, but those 2 players also happen to be in the top 10! We can look at our other graph, “2015 Country Depth by Percentage” to see that indeed, Spain (ESP), France (FRA), and Switzerland (SUI) dominated the top 10. One interesting note is the USA dropped out of the top 10 after a solid showing in the top 100 and top 50.   
+
+
+
+
+For Part II we had to merge the different data frames into one so we could visualize this in one graph. Therefore, we took advantage of the table and merge functions in R. We also had to reshape our new table to be ready to use ggplot correctly. We want to show the evolution of rankings - a year on year change of how many players in each category to show most consistent countries, based off the starting point of year 2010.
+
+```{r, eval = TRUE, echo = FALSE, warning=FALSE, message=FALSE}
+
+#now we need at least 5 players in the top100
+country_freqs_10 <- sort(table(rankings_10$country), 
+                        decreasing = TRUE)
+depth_freqs_10 <- as.data.frame(country_freqs_10)
+depth_freqs_10 <- as.data.frame(
+  depth_freqs_10[(depth_freqs_10$country_freqs_10 >= 5),])
+colnames(depth_freqs_10) <- "2010"
+
+country_freqs_11 <- sort(table(rankings_11$country), 
+                         decreasing = TRUE)
+depth_freqs_11 <- as.data.frame(country_freqs_11)
+depth_freqs_11 <- as.data.frame(
+  depth_freqs_11[(depth_freqs_11$country_freqs_11 >= 5),])
+colnames(depth_freqs_11) <- "2011"
+
+country_freqs_12 <- sort(table(rankings_12$country), 
+                         decreasing = TRUE)
+depth_freqs_12 <- as.data.frame(country_freqs_12)
+depth_freqs_12 <- as.data.frame(
+  depth_freqs_12[(depth_freqs_12$country_freqs_12 >= 5),])
+colnames(depth_freqs_12) <- "2012"
+
+country_freqs_13 <- sort(table(rankings_13$country), 
+                         decreasing = TRUE)
+depth_freqs_13 <- as.data.frame(country_freqs_13)
+depth_freqs_13 <- as.data.frame(
+  depth_freqs_13[(depth_freqs_13$country_freqs_13 >= 5),])
+colnames(depth_freqs_13) <- "2013"
+
+country_freqs_14 <- sort(table(rankings_14$country), 
+                         decreasing = TRUE)
+depth_freqs_14 <- as.data.frame(country_freqs_14)
+depth_freqs_14 <- as.data.frame(
+  depth_freqs_14[(depth_freqs_14$country_freqs_14 >= 5),])
+colnames(depth_freqs_14) <- "2014"
+
+country_freqs_15 <- sort(table(rankings_15$country), 
+                         decreasing = TRUE)
+depth_freqs_15 <- as.data.frame(country_freqs_15)
+depth_freqs_15 <- as.data.frame(
+  depth_freqs_15[(depth_freqs_15$country_freqs_15 >= 5),])
+colnames(depth_freqs_15) <- "2015"
+
+# created all_merged data frame
+
+all_merged <- merge(depth_freqs_10, depth_freqs_11, by = 0, all.x=TRUE)
+row.names(all_merged) <- all_merged$Row.names
+all_merged$Row.names <- NULL
+
+all_merged <- merge(all_merged, depth_freqs_12, by = 0, all.x = TRUE)
+row.names(all_merged) <- all_merged$Row.names
+all_merged$Row.names <- NULL
+
+all_merged <- merge(all_merged, depth_freqs_13, by = 0, all.x = TRUE)
+row.names(all_merged) <- all_merged$Row.names
+all_merged$Row.names <- NULL
+
+all_merged <- merge(all_merged, depth_freqs_14, by = 0, all.x = TRUE)
+row.names(all_merged) <- all_merged$Row.names
+all_merged$Row.names <- NULL
+
+all_merged <- merge(all_merged, depth_freqs_15, by = 0, all.x = TRUE)
+row.names(all_merged) <- all_merged$Row.names
+all_merged$Row.names <- NULL
+
+# merged_before_reshape is the data.frame before a reshape
+merged_before_reshape <- all_merged
+
+country_names <- rownames(all_merged)
+library(reshape2)
+all_merged <- melt(all_merged)
+all_merged[is.na(all_merged)] <- 0
+all_merged$country <- country_names
+
+# Plot the top players in countries by year
+pdf("../images/evolution_rankings_2015.pdf")
+a<-dev.cur()
+png("../images/evolution_rankings_2015.png")
+dev.control("enable")
+ggplot(all_merged, aes(variable, value, group=factor(country), 
+                       color = factor(country))) + geom_line(size=.75) +
+  geom_point() +
+  ylab("Number of Players in Top 100") +
+  xlab("Year") +
+  ggtitle("Evolution of Tennis Rankings") +
+  theme(legend.title = element_text(size=12)) +
+  scale_color_discrete(name="Country")
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
+
+```
+
+From Part II, we analyzed the movement and evolution of rankings of these countries from 2010 - 2015. We use “Evolution of Tennis Rankings” to determine the consistency of these countries. Just from looking at the graph, we can note that Spain was consistently on the top, with France a consistent second rank. After those top two, it gets a bit fuzzier. USA jumps from having 5 to 9 players in the top 100 from 2010-2015. But what is discouraging for Germany is that they are trending downwards. From 9 in the top100 in 2010, they dipped to 6 in 2012 and struggled to having no more players in the top 100 by 2015.   
+
+
+
+For Part III, we want to find out how good the average player is; in other words, how much a player contributes to his country's ranking on average. We will use data from 2015. Average number of points per any country: this is the sum of all points / number of unique countries = averae points for a country. Our metric for determining how good a player is will be comparing the number of points that player has versus the numbr of points the average player has. Therefore we have: number of points of the country / # of players in that country = how good that player is.  
+
+```{r, eval = TRUE, echo = FALSE, warning= FALSE, message= FALSE}
+# get sum of all the points
+sum_2015_points <- sum(rankings_15$points)
+distinct_countries <- unique(rankings_15$country)
+avg_points_per_country <- sum_2015_points / length(distinct_countries)
+
+# make data frame with points and country
+country_points <- data.frame(rankings_15$points, rankings_15$country)
+names(country_points) <- c("points", "country")
+
+# create list of country and points
+list_points <- c()
+for (i in 1:length(distinct_countries)) {
+  index1 <- which(country_points$country == distinct_countries[i])
+  temp1 <- c(rankings_15$points[index1])
+  list_points[[i]] <- temp1
+}
+names(list_points) <- distinct_countries
+
+# get the average points for top100 players
+avg_points_per_player <- sum_2015_points / nrow(rankings_15)
+
+# get avergae points for a country's players
+avg_player_for_country = list()
+for (i in 1:length(list_points)) {
+  avg_player_for_country[[i]] <- sum(
+      (list_points[[i]]) / length(list_points[[i]]))
+}
+names(avg_player_for_country) <- distinct_countries
+
+# compare all average player points vs the country's average player points
+list_difference_country_vs_avg <- list()
+for (i in 1:length(avg_player_for_country)) {
+  list_difference_country_vs_avg[[i]] <- avg_player_for_country[[i]] 
+                                          - avg_points_per_player
+}
+names(list_difference_country_vs_avg) <- distinct_countries
+
+avg_vs_country_2015 <- data.frame(
+  matrix(unlist(list_difference_country_vs_avg), 
+                nrow=length(list_difference_country_vs_avg), 
+                byrow=T),
+                row.names = distinct_countries)
+names(avg_vs_country_2015) <- "difference"
+
+country_vs_avg_2015_sorted <- avg_vs_country_2015[order(
+                              avg_vs_country_2015$difference, 
+                                    decreasing = TRUE), , drop = FALSE]
+
+top_5_countries_by_avg_points <- head(country_vs_avg_2015_sorted, n = 5)
+bottom_5_countries_by_avg_points <- tail(country_vs_avg_2015_sorted, n = 5)
+
+top_5_countries_by_avg_points
+
+pdf("../images/country_points_2015.pdf")
+a<-dev.cur()
+png("../images/country_points_2015.png")
+dev.control("enable")
+t <- ggplot(top_5_countries_by_avg_points, 
+            aes(rownames(top_5_countries_by_avg_points), 
+                difference, group=factor(country), 
+                color = factor(rownames(top_5_countries_by_avg_points))))
+t + geom_bar(stat = "identity") + xlab("Country") +
+  ylab("Average Country Points - Average Overall Player") +
+  ggtitle("Top 5 Countries by Average Points 2015") +
+  theme(legend.title = element_text(size=12)) +
+  scale_color_discrete(name="Country")
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
+
+```
+
+From Part III, we look at our graph “Top 5 Countries by Average Points 2015” to see which are the strongest overall countries by the amount of points they accumulated in comparison to the average. Immediately we see Switzerland, Serbia, and Germany in the top three. Something interesting is that Spain is no longer a part of the top 5 countries, though previously they showed in the depth rankings. If we looked at our table, “country vs avg 2015 sorted” we would notice that Spain was ranked 9th in overall points.
+
+
+#Conclusion
+
+From the analysis conducted from match statistics it can be deduced that even within the group of countries that appear to dominate the sport in men's singles, there is a division between how much they divide. Analysis of the total number of titles showed that Spain, as number one, appears to completely overwhelm the others in terms of absolute number of titles won, which after further analysis can be attributed to particular dominance on clay courts and lower level tournaments. From the analysis of titles by level of tournament, we can also conclude that there is a significant divide between the top 3 nations -Spain, Serbia, and Switzerland- and the rest of the world in terms of quality of players, with those nations having dominated most of the higher level tournaments in the sport since 2010. From these rankings we can conclude that the dominant countries of tennis, from 2010 to 2015 are, in no particular order: Spain, France, Switzerland, and Serbia. These findings do make sense if we look at the individual players. For Spain, top players like Rafael Nadal, Feliciano Lopez, and Roberto Bautista Agut boost the rankings for Spain. For France, Fichard Hasquet, Jo Wilfried Tsonga, Gilles Simon, Benoit  Paire, among others help their strong showing at the top. Switzerland boasts two of the top 5 players in Roger Federer and Stanislas Wawrinka, but apart from those two, Switzerland doesn’t have much depth. Finally, Novak Djokovic, the current World Number 1, has bolstered Serbia’s rankings mostly by himself, with fellow countryman Viktor Troicki also in the top 50. 
+
+# Final Remarks
+By doing this project to look through a mine of data, we could really analyze and draw strong conclusions for tennis. Sports and data is such a thriving place for exploration, and we are glad that we chose this topic for our project. By using R, we have gained the tools to do even more data mining in the future. If we had more time, we could go in more depth with the individual's statistics over their career, as that could be an interesting path to investigate. Overall, we are impressed by how much data is available, as we barely scratched the surface of the abundant amount of analysis we could do. But we are proud of our work, as we both learned a lot about tennis and about data mining by doing this proejct!
