@@ -4,17 +4,17 @@ author: "William Cheung"
 date: "December 9, 2015"
 output: pdf_document
 ---
+# DATA ANALYSIS BY RANKINGS
 
-# Introduction
+## Introduction
 
 We will use the Tennis ATP Rankings from 2015 to determine the competitive depth of a country's tennis representation. First we will read in the data from clean_data directory. We want the top 100 players from each year, and their corresponding country they represent. We have three parts to this analysis.  
 In Part I we will analyze at the rankings for 2015, looking for a country's depth of players. 
 In Part II we will analyze the evolution of rankings over the years from 2010 to 2015.
 In Part III we will analyze the average amount of weight a player countributes to his country from 2015 stats.
-```{r, eval=TRUE}
+```{r, eval=TRUE, warning= FALSE, message= FALSE}
 library("readr")
-setwd("/Users/williamcheung/Desktop/stats133/Tennis/")
-setwd("./code")
+setwd("../code")
 
 # read in the files from clean_data
 rankings_10 <- read.csv("../clean_data/2010_top100.csv", header = TRUE)
@@ -24,7 +24,7 @@ rankings_13 <- read.csv("../clean_data/2013_top100.csv", header = TRUE)
 rankings_14 <- read.csv("../clean_data/2014_top100.csv", header = TRUE)
 rankings_15 <- read.csv("../clean_data/2015_top100.csv", header = TRUE)
 
-# Get sorted frequencies of countries with more than 1 player in the top 100 for 2010
+# Sorted frequencies of countries with > 1 player in the top 100 for 2010
 country_freqs <- sort(table(rankings_15$country), decreasing = TRUE)
 depth_freqs <- as.data.frame(country_freqs)
 depth_freqs <- as.data.frame(depth_freqs[!(depth_freqs$country_freqs == 1),])
@@ -52,14 +52,14 @@ top10 = Vectorize(top10)
 
 \newpage
 
-# Part I.
+## Part I.
 
 We will now break down the countries with most players in the top 100, then categorize them by counting the number of players in the top 50, top 20, and top 10. We define depth in this case as a country having more than 1 player in the top 100. Then we will dig deeper to see if these countries are still represented in the top 50, top 20, and top 10.
-```{r}
+```{r, warning= FALSE, message= FALSE}
 library(reshape2)
 library(ggplot2)
 
-# Create a list and map the country with index of which ranking its player is in the top 100 from 2010.
+# Create a list, map the country with index of player ranking from 2010.
 country_vec <- c()
 list_top100 <- list()
 for (i in 1:nrow(depth_freqs)) {
@@ -69,35 +69,37 @@ for (i in 1:nrow(depth_freqs)) {
   list_top100[[i]] <- temp
 }
 
-# Create a list and map the country with index of which ranking its player is in the top 50.
+# Create a list and map the country with ranking index in the top 50.
 list_top50 <- list()
 for (i in 1:nrow(depth_freqs)) {
   list_top50[[i]] <- list_top100[[i]][top50(list_top100[[i]])]
 }
 
-# Create a list and map the country with index of which ranking its player is in the top 20.
+# Create a list and map the country with ranking index in the top 20.
 list_top20 <- list()
 for (i in 1:nrow(depth_freqs)) {
   list_top20[[i]] <- list_top100[[i]][top20(list_top100[[i]])]
 }
 
-# Create a list and map the country with index of which ranking its player is in the top 10.
+# Create a list and map the country with ranking index in the top 10.
 list_top10 <- list()
 for (i in 1:nrow(depth_freqs)) {
   list_top10[[i]] <- list_top100[[i]][top10(list_top100[[i]])]
 }
 
-# Prepare is the helper function to map those names of countries to their respective numbers.
+# Helper function to map names of countries to respective numbers.
 prepare <- function(input_freqs) {
   country_stats <- list()
   for (i in 1:nrow(input_freqs)) {
-    country_stats[[i]] <- c(length(list_top100[[i]]), length(list_top50[[i]]),
-                            length(list_top20[[i]]), length(list_top10[[i]]))
+    country_stats[[i]] <- c(length(list_top100[[i]]), 
+                            length(list_top50[[i]]),
+                            length(list_top20[[i]]), 
+                            length(list_top10[[i]]))
   }
   names(country_stats) = country_vec
   return (country_stats)
 }
-# Create list of countries and how many of its players are in top 100, 50, 20, 10 from 2010.
+# Create list of countries and player freqeuncy in top 100, 50, 20, 10
 list_of_freqs <- prepare(depth_freqs)
 countries <- names(list_of_freqs)
 
@@ -113,31 +115,84 @@ for (country in 1:length(list_of_freqs)) {
   all_10 <- c(all_10, list_of_freqs[[country]][4])
 }
 
-# Create data frame of Countries with their respective number of players in the top 100, 50, 20 and 10.
-final <- data.frame(top100 = all_100, top50 = all_50, top20 = all_20, top10 = all_10)
+# Create data frame of countries with respective number 
+# of players in the top 100, 50, 20 and 10.
+final <- data.frame(top100 = all_100, 
+                    top50 = all_50, 
+                    top20 = all_20, 
+                    top10 = all_10)
 rownames(final) <- countries
 ```
 
 \newpage
-First we will create basic barplots to visualize the number of players each country has in each category for 2010.
-```{r}
+First we will create basic barplots to visualize the number of players each country has in each category for 2015.
+```{r, warning= FALSE, message= FALSE}
 # Create barplots of the top 100, 50, 20, and 10 for each country.
-rainbow_16 <-rainbow(n=16, s = 1, v = 1, start = 0, end = max(1, 16 - 1)/16, alpha = 1)
-top100_bar <- barplot(final$top100, names.arg = rownames(final), ylab = "Number of Players", 
-        xlab = "Country", las = 2, col = rainbow_16, main = "Top 100 for 2015 by Country")
-abline(h = seq(from = 0, to = 14, by = 2), col = ' gray')
+rainbow_16 <-rainbow(n=16, s = 1, v = 1, 
+                     start = 0, end = max(1, 16 - 1)/16, 
+                     alpha = 1)
 
-top50_bar <- barplot(final$top50, names.arg = rownames(final), ylab = "Number of Players",
-        xlab = "Country", las = 2, col = rainbow_16, main = "Top 50 for 2015 by Country")
-abline(h = seq(from = 0, to = 14, by = 2), col = ' gray')
 
-top20_bar <- barplot(final$top20, names.arg = rownames(final), ylab = "Number of Players", 
-        xlab = "Country", las = 2, col = rainbow_16, main = "Top 20 for 2015 by Country")
+pdf("../images/top_100_2015.pdf")
+a<-dev.cur()
+png("../images/top_100_2015.png")
+dev.control("enable")
+top100_bar <- barplot(final$top100, names.arg = rownames(final), 
+                      ylab = "Number of Players", 
+                      xlab = "Country", las = 2, 
+                      col = rainbow_16, 
+                      main = "Top 100 for 2015 by Country")
+abline(h = seq(from = 0, to = 14, by = 2), col = ' gray')
+dev.copy(which=a)
+dev.off()
+dev.off()
+
+pdf("../images/top_50_2015.pdf")
+a<-dev.cur()
+png("../images/top_50_2015.png")
+dev.control("enable")
+top50_bar <- barplot(final$top50, 
+                     names.arg = rownames(final), 
+                     ylab = "Number of Players",
+                     xlab = "Country", 
+                     las = 2, 
+                     col = rainbow_16, 
+                     main = "Top 50 for 2015 by Country")
+abline(h = seq(from = 0, to = 14, by = 2), col = ' gray')
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
+
+pdf("../images/top_20_2015.pdf")
+a<-dev.cur()
+png("../images/top_20_2015.png")
+dev.control("enable")
+top20_bar <- barplot(final$top20, 
+                     names.arg = rownames(final), 
+                     ylab = "Number of Players", 
+                     xlab = "Country", 
+                     las = 2, 
+                     col = rainbow_16, 
+                     main = "Top 20 for 2015 by Country")
 abline(h = seq(from = 0, to = 14, by = 1), col = ' gray')
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
 
-top10_bar <- barplot(final$top10, names.arg = rownames(final), ylab = "Number of Players", 
-        xlab = "Country", las = 2, col = rainbow_16, main = "Top 10 for 2015 by Country")
+pdf("../images/top_10_2015.pdf")
+a<-dev.cur()
+png("../images/top_10_2015.png")
+dev.control("enable")
+top10_bar <- barplot(final$top10, 
+                     names.arg = rownames(final), 
+                     ylab = "Number of Players", 
+                     xlab = "Country", 
+                     las = 2, col = rainbow_16, 
+                     main = "Top 10 for 2015 by Country")
 abline(h = seq(from = 0, to = 14, by = 0.5), col = ' gray')
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
 ```
 
 
@@ -152,33 +207,50 @@ final <- melt(final)
 final$country <- final_country_names
 
 # Plot Country's Depth for 2015
-ggplot(final, aes(variable, value, group=factor(country), color = factor(country))) + geom_line(size=.75) + geom_point() + ylab("Number of Players") + xlab("Category") + ggtitle("2015 Country Depth") + theme(legend.title = element_text(size=16, face="bold"))+ scale_color_discrete(name="Country")
+pdf("../images/country_depth_2015.pdf")
+a<-dev.cur()
+png("../images/country_depth_2015.png")
+dev.control("enable")
+ggplot(final, aes(variable, value, group=factor(country), 
+                  color = factor(country))) + 
+        geom_line(size=.75) + geom_point() + 
+        ylab("Number of Players") + xlab("Category") + 
+        ggtitle("2015 Country Depth") + 
+        theme(legend.title = element_text(size=16, face="bold")) +
+        scale_color_discrete(name="Country")
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
 
 
 # Now Plot the percentage of players in each category.
 sum_top100 <- sum(final_before_reshape$top100)
 percentage_100 = c()
 for (i in 1:length(rownames(final_before_reshape))) {
-  percentage_100 = c(percentage_100, final_before_reshape[,1][i] / sum_top100)
+  percentage_100 = c(percentage_100, 
+                     final_before_reshape[,1][i] / sum_top100)
 }
 
 # Calculate percentages
 sum_top50 <- sum(final_before_reshape$top50)
 percentage_50 = c()
 for (i in 1:length(rownames(final_before_reshape))) {
-  percentage_50 = c(percentage_50, final_before_reshape[,2][i] / sum_top50)
+  percentage_50 = c(percentage_50, 
+                    final_before_reshape[,2][i] / sum_top50)
 }
 
 sum_top20 <- sum(final_before_reshape$top20)
 percentage_20 = c()
 for (i in 1:length(rownames(final_before_reshape))) {
-  percentage_20 = c(percentage_20, final_before_reshape[,3][i] / sum_top20)
+  percentage_20 = c(percentage_20, 
+                    final_before_reshape[,3][i] / sum_top20)
 }
 
 sum_top10 <- sum(final_before_reshape$top10)
 percentage_10 = c()
 for (i in 1:length(rownames(final_before_reshape))) {
-  percentage_10 = c(percentage_10, final_before_reshape[,4][i] / sum_top10)
+  percentage_10 = c(percentage_10, 
+                    final_before_reshape[,4][i] / sum_top10)
 }
 
 percentage_final <- final_before_reshape
@@ -193,45 +265,71 @@ percentage_final <- melt(percentage_final)
 percentage_final$country <- final_country_names
 
 # Plot the Country's Depth in 2015 by Percentage
-ggplot(percentage_final, aes(variable, value, group=factor(country), color = factor(country))) + geom_line(size=.75) + geom_point() + ylab("Percentage of Players in Respective Category") + xlab("Category") + ggtitle("2015 Country Depth by Percentage") + theme(legend.title = element_text(size=16, face="bold"))+ scale_color_discrete(name="Country")
+pdf("../images/country_percentage_2015.pdf")
+a<-dev.cur()
+png("../images/country_percentage_2015.png")
+dev.control("enable")
+ggplot(percentage_final, aes(variable, value, group=factor(country), 
+                             color = factor(country))) + 
+    geom_line(size=.75) + geom_point() +
+    ylab("Percentage of Players in Respective Category") +
+    xlab("Category") +
+    ggtitle("2015 Country Depth by Percentage") +
+    theme(legend.title = element_text(size=16, face="bold")) +
+    scale_color_discrete(name="Country")
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
 ```
 
 \newpage
 
-# Part II. 
+## Part II. 
 
 Evolution of rankings- a year on year change of how many players in each category: show most consistent countries, based off the starting point of year 2010.
 ```{r, warning=FALSE, message=FALSE}
 
 #now we need at least 5 players in the top100
-country_freqs_10 <- sort(table(rankings_10$country), decreasing = TRUE)
+country_freqs_10 <- sort(table(rankings_10$country), 
+                        decreasing = TRUE)
 depth_freqs_10 <- as.data.frame(country_freqs_10)
-depth_freqs_10 <- as.data.frame(depth_freqs_10[(depth_freqs_10$country_freqs_10 >= 5),])
+depth_freqs_10 <- as.data.frame(
+  depth_freqs_10[(depth_freqs_10$country_freqs_10 >= 5),])
 colnames(depth_freqs_10) <- "2010"
 
-country_freqs_11 <- sort(table(rankings_11$country), decreasing = TRUE)
+country_freqs_11 <- sort(table(rankings_11$country), 
+                         decreasing = TRUE)
 depth_freqs_11 <- as.data.frame(country_freqs_11)
-depth_freqs_11 <- as.data.frame(depth_freqs_11[(depth_freqs_11$country_freqs_11 >= 5),])
+depth_freqs_11 <- as.data.frame(
+  depth_freqs_11[(depth_freqs_11$country_freqs_11 >= 5),])
 colnames(depth_freqs_11) <- "2011"
 
-country_freqs_12 <- sort(table(rankings_12$country), decreasing = TRUE)
+country_freqs_12 <- sort(table(rankings_12$country), 
+                         decreasing = TRUE)
 depth_freqs_12 <- as.data.frame(country_freqs_12)
-depth_freqs_12 <- as.data.frame(depth_freqs_12[(depth_freqs_12$country_freqs_12 >= 5),])
+depth_freqs_12 <- as.data.frame(
+  depth_freqs_12[(depth_freqs_12$country_freqs_12 >= 5),])
 colnames(depth_freqs_12) <- "2012"
 
-country_freqs_13 <- sort(table(rankings_13$country), decreasing = TRUE)
+country_freqs_13 <- sort(table(rankings_13$country), 
+                         decreasing = TRUE)
 depth_freqs_13 <- as.data.frame(country_freqs_13)
-depth_freqs_13 <- as.data.frame(depth_freqs_13[(depth_freqs_13$country_freqs_13 >= 5),])
+depth_freqs_13 <- as.data.frame(
+  depth_freqs_13[(depth_freqs_13$country_freqs_13 >= 5),])
 colnames(depth_freqs_13) <- "2013"
 
-country_freqs_14 <- sort(table(rankings_14$country), decreasing = TRUE)
+country_freqs_14 <- sort(table(rankings_14$country), 
+                         decreasing = TRUE)
 depth_freqs_14 <- as.data.frame(country_freqs_14)
-depth_freqs_14 <- as.data.frame(depth_freqs_14[(depth_freqs_14$country_freqs_14 >= 5),])
+depth_freqs_14 <- as.data.frame(
+  depth_freqs_14[(depth_freqs_14$country_freqs_14 >= 5),])
 colnames(depth_freqs_14) <- "2014"
 
-country_freqs_15 <- sort(table(rankings_15$country), decreasing = TRUE)
+country_freqs_15 <- sort(table(rankings_15$country), 
+                         decreasing = TRUE)
 depth_freqs_15 <- as.data.frame(country_freqs_15)
-depth_freqs_15 <- as.data.frame(depth_freqs_15[(depth_freqs_15$country_freqs_15 >= 5),])
+depth_freqs_15 <- as.data.frame(
+  depth_freqs_15[(depth_freqs_15$country_freqs_15 >= 5),])
 colnames(depth_freqs_15) <- "2015"
 
 # created all_merged data frame
@@ -265,18 +363,32 @@ all_merged <- melt(all_merged)
 all_merged[is.na(all_merged)] <- 0
 all_merged$country <- country_names
 
-# Got the graph!
-ggplot(all_merged, aes(variable, value, group=factor(country), color = factor(country))) + geom_line(size=.75) + geom_point() + ylab("Number of Players in Top 100") + xlab("Year") + ggtitle("Evolution of Tennis Rankings") + theme(legend.title = element_text(size=12))+ scale_color_discrete(name="Country")
+# Plot the top players in countries by year
+pdf("../images/evolution_rankings_2015.pdf")
+a<-dev.cur()
+png("../images/evolution_rankings_2015.png")
+dev.control("enable")
+ggplot(all_merged, aes(variable, value, group=factor(country), 
+                       color = factor(country))) + geom_line(size=.75) +
+  geom_point() +
+  ylab("Number of Players in Top 100") +
+  xlab("Year") +
+  ggtitle("Evolution of Tennis Rankings") +
+  theme(legend.title = element_text(size=12)) +
+  scale_color_discrete(name="Country")
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
 
 ```
 
 
 \newpage
 
-# Part III.
+## Part III.
 
 For every country add the points on. Average number of points per country. We want to find out how good the average player is. How much a player contributes on average. We will use data from 2015. Average number of points per any country: this is the sum of all points / number of unique countries = averae points for a country. Our metric for determining how good a player is will be comparing the number of points that player has versus the numbr of points the average player has. Therefore we have: number of points of the country / # of players in that country = how good that player is.
-```{r}
+```{r, warning= FALSE, message= FALSE}
 # get sum of all the points
 sum_2015_points <- sum(rankings_15$points)
 distinct_countries <- unique(rankings_15$country)
@@ -301,26 +413,29 @@ avg_points_per_player <- sum_2015_points / nrow(rankings_15)
 # get avergae points for a country's players
 avg_player_for_country = list()
 for (i in 1:length(list_points)) {
-  avg_player_for_country[[i]] <- sum((list_points[[i]]) / length(list_points[[i]]))
+  avg_player_for_country[[i]] <- sum(
+      (list_points[[i]]) / length(list_points[[i]]))
 }
 names(avg_player_for_country) <- distinct_countries
 
-# compare average points for all players vs the country's average player points
+# compare all average player points vs the country's average player points
 list_difference_country_vs_avg <- list()
 for (i in 1:length(avg_player_for_country)) {
-  list_difference_country_vs_avg[[i]] <- avg_player_for_country[[i]] - avg_points_per_player
+  list_difference_country_vs_avg[[i]] <- avg_player_for_country[[i]] 
+                                          - avg_points_per_player
 }
 names(list_difference_country_vs_avg) <- distinct_countries
 
-avg_vs_country_2015 <- data.frame(matrix(unlist(list_difference_country_vs_avg), 
-                                         nrow=length(list_difference_country_vs_avg), byrow=T),
-                                         row.names = distinct_countries)
+avg_vs_country_2015 <- data.frame(
+  matrix(unlist(list_difference_country_vs_avg), 
+                nrow=length(list_difference_country_vs_avg), 
+                byrow=T),
+                row.names = distinct_countries)
 names(avg_vs_country_2015) <- "difference"
 
 country_vs_avg_2015_sorted <- avg_vs_country_2015[order(
                               avg_vs_country_2015$difference, 
-                                                  decreasing = TRUE), 
-                                    , drop = FALSE]
+                                    decreasing = TRUE), , drop = FALSE]
 
 top_5_countries_by_avg_points <- head(country_vs_avg_2015_sorted, n = 5)
 bottom_5_countries_by_avg_points <- tail(country_vs_avg_2015_sorted, n = 5)
@@ -328,8 +443,22 @@ bottom_5_countries_by_avg_points <- tail(country_vs_avg_2015_sorted, n = 5)
 top_5_countries_by_avg_points
 bottom_5_countries_by_avg_points
 
-t <- ggplot(top_5_countries_by_avg_points, aes(rownames(top_5_countries_by_avg_points), difference, group=factor(country), color = factor(rownames(top_5_countries_by_avg_points))))
-t + geom_bar(stat = "identity") + xlab("Country") + ylab("Average Country Points - Average Overall Player") + ggtitle("Top 5 Countries by Average Points 2015") + theme(legend.title = element_text(size=12))+ scale_color_discrete(name="Country")
+pdf("../images/country_points_2015.pdf")
+a<-dev.cur()
+png("../images/country_points_2015.png")
+dev.control("enable")
+t <- ggplot(top_5_countries_by_avg_points, 
+            aes(rownames(top_5_countries_by_avg_points), 
+                difference, group=factor(country), 
+                color = factor(rownames(top_5_countries_by_avg_points))))
+t + geom_bar(stat = "identity") + xlab("Country") +
+  ylab("Average Country Points - Average Overall Player") +
+  ggtitle("Top 5 Countries by Average Points 2015") +
+  theme(legend.title = element_text(size=12)) +
+  scale_color_discrete(name="Country")
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
 
 ```
 

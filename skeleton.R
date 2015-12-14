@@ -1,11 +1,13 @@
 
 # title: "skeleton"
-# author: "Matthew Weglick William Cheung"
+# author: "Matthew Weglicki, William Cheung"
 # date: "November 18, 2015"
 # output: creates subdirectories for the project
 
 # Also contains the commands to download raw data files to the corresponding directory
 # If we download resource files will also have commands to download to resources folder. 
+# Note: There is also a directory called "TennisAnalysis." 
+# This was created as a GitHub repository. Here is the link: https://github.com/william0cheung/TennisAnalysis 
 
 # create raw_data directory
 dir.create("raw_data")

@@ -9,9 +9,9 @@ output: pdf_document
 ```{r}
 library("readr")
 
-getwd()
-
 setwd("../raw_data")
+
+dir.create("./meta_data", recursive = FALSE)
 
 download.file("https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_rankings_current.csv", "rankings_curr.csv")
 rankings_curr <- read_csv("rankings_curr.csv")

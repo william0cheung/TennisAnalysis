@@ -1,0 +1,15 @@
+---
+title: "Metadata"
+author: "William Cheung"
+date: "December 13, 2015"
+output: pdf_document
+---
+
+# Meta Data: Data Dictionary 
+
+This file describes the variables, fields, or columns of the raw data. We are using scraping from a database online, credit to Jeff Sackmann for providing the data for use. We are using his Github account, https://github.com/JeffSackmann and going through the csv files in https://github.com/JeffSackmann/tennis_atp. 
+
+Data Directory:
+
+The player file columns are player_id, first_name, last_name, hand, birth_date, country_code.
+The columns for the ranking files are ranking_date, ranking, player_id, ranking_points.

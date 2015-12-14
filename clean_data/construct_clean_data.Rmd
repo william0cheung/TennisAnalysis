@@ -10,8 +10,6 @@ library("readr")
 
 setwd("../clean_data")
 
-getwd()
-
 # reading in the files
 rankings_10 <- read.csv("../raw_data/rankings_10.csv", header = FALSE)
 rankings_curr <- read.csv("../raw_data/rankings_curr.csv", header = FALSE)

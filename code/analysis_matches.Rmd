@@ -13,8 +13,7 @@ First we must create the functions which when given the match statistics from ce
 
 ```{r, eval=TRUE, tidy=TRUE}
 
-setwd("/Users/williamcheung/Desktop/stats133/Tennis/")
-setwd("./code")
+setwd("../code")
 
 library("readr")
 
@@ -22,7 +21,7 @@ library("readr")
 matches_10 <- read_csv("../clean_data/matches_10_clean.csv")
 matches_11 <- read_csv("../clean_data/matches_11_clean.csv")
 matches_12 <- read_csv("../clean_data/matches_12_clean.csv")
-# exclude an entry from data which was repetitive and hence placed a bug in the analysis later on
+# exclude a repetitive entry from data which bugged the analysis later on
 matches_12 <- matches_12[-2656, ]
 matches_13 <- read_csv("../clean_data/matches_13_clean.csv")
 matches_14 <- read_csv("../clean_data/matches_14_clean.csv")
@@ -33,24 +32,32 @@ uniq_tour <- function(tour_year) {
 return(unique(tour_year$tourney_name))
 }
 
-# function when given a name or list of names of tournaments and a given year will output the total number of matches in the tournament(s), hence allows you to find the index of the final match of the tournament
-tour_num_matches <- function(tour_names, tour_year) { num_matches <- numeric(0) 
-for (i in tour_names) { 
-  num_matches <- c(num_matches, as.numeric(sum(tour_year$tourney_name == i)))
-} 
-return(num_matches)
+# function when given a name or list of names of tournaments and a given year 
+# will output the total number of matches in the tournament(s), hence 
+# allows you to find the index of the final match of the tournament
+tour_num_matches <- function(tour_names, tour_year) {
+  num_matches <- numeric(0) 
+  for (i in tour_names) { 
+    num_matches <- c(num_matches, 
+                     as.numeric(sum(tour_year$tourney_name == i)))
+  } 
+  return(num_matches)
 }
 
-# function that when given tour_year, uniq_tour and total matches in each tournament, returns the ioc of the title winner
+# function that when given tour_year, uniq_tour and total matches in each 
+# tournament, returns the ioc of the title winner
 title_winner_ioc <- function(tour_year, tour_names, total_matches) {
   ioc_list <- character(0)
   for (i in 1:length(tour_names)) {
-    ioc_list <- c(ioc_list, tour_year[tour_year$tourney_name == tour_names[i] & tour_year$match_num == total_matches[i], 6])
+    ioc_list <- c(ioc_list, tour_year[tour_year$tourney_name == 
+                                      tour_names[i] & tour_year$match_num == 
+                                      total_matches[i], 6])
   }
   return(ioc_list)
 }
 
-# function that combines all of the above ie given a match year, it just displays a list of the countries that won the tournaments in a given year
+# function that combines all of the above ie given a match year, it just 
+# displays a list of the countries that won the tournaments in a given year
 title_winning_iocs <- function(tour_year) {
   tour_names <- uniq_tour(tour_year)
   total_matches <- tour_num_matches(tour_names, tour_year)
@@ -64,7 +71,10 @@ title_winning_iocs <- function(tour_year) {
 title_winner_surface <- function(tour_year, tour_names, total_matches) {
   surface_list <- character(0)
   for (i in 1:length(tour_names)) {
-    surface_list <- c(surface_list, tour_year[tour_year$tourney_name == tour_names[i] & tour_year$match_num == total_matches[i], 2])
+    surface_list <- c(surface_list, 
+                      tour_year[tour_year$tourney_name == 
+                                tour_names[i] & tour_year$match_num
+                                == total_matches[i], 2])
   }
   return(surface_list)
 }
@@ -80,7 +90,9 @@ title_winning_surfaces <- function(tour_year) {
 title_winner_level <- function(tour_year, tour_names, total_matches) {
   level_list <- character(0)
   for (i in 1:length(tour_names)) {
-    level_list <- c(level_list, tour_year[tour_year$tourney_name == tour_names[i] & tour_year$match_num == total_matches[i], 3])
+    level_list <- c(level_list, 
+                    tour_year[tour_year$tourney_name == tour_names[i] & 
+                              tour_year$match_num == total_matches[i], 3])
   }
   return(level_list)
 }
@@ -99,7 +111,7 @@ title_winning_levels <- function(tour_year) {
 Now we move onto applying the functions from part I in order to create dataframes for each year containing information about the winning nationality, surface and level of each tournament in that year. We then consolidate all these dataframes into one comprehensive dataframe, from which we will be able to conduct our appropriate analysis.  
 
 ```{r, eval=TRUE}
-# create a dataframe for each year with the information in the above description  
+# create a dataframe for each year with the information in above description  
 df_2010 <- data.frame(
   tournament_name = uniq_tour(matches_10),
   winner_ioc = title_winning_iocs(matches_10),
@@ -186,10 +198,20 @@ top5 <- ordered_titles_by_ioc[1:5]
 top5_names <- names(top5)
 
 # construct barplot in terms of top 5 title winning countries
-barplot(top5, xpd = F, axes = F, main = "Total number of titles by top 5 countries", xlab = "Country", ylim = c(0, 100), ylab = "Total number of titles")
-axis(side = 2, at = seq(from = 0, to = 100, by = 20), tick = TRUE, las = 2)
-
-
+pdf("../images/top_5_titles.pdf")
+a<-dev.cur()
+png("../images/top_5_titles.png")
+dev.control("enable")
+barplot(top5, xpd = F, axes = F, 
+        main = "Total number of titles by top 5 countries", 
+        xlab = "Country", 
+        ylim = c(0, 100), 
+        ylab = "Total number of titles")
+axis(side = 2, at = seq(from = 0, to = 100, by = 20), 
+     tick = TRUE, las = 2)
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
 ```
 
 
@@ -199,17 +221,23 @@ Titles by Surface:
 # number of titles each country wins on each surface
 clay_wins_list <- numeric(0)
 for (i in winner_ioc_list) 
-  {clay_wins_list <- c(clay_wins_list, sum(master_df$winner_ioc == i & master_df$winning_surface == 'Clay'))
+  {clay_wins_list <- c(clay_wins_list, 
+                       sum(master_df$winner_ioc == i & 
+                           master_df$winning_surface == 'Clay'))
 }
 
 grass_wins_list <- numeric(0)
 for (i in winner_ioc_list) {
-  grass_wins_list <- c(grass_wins_list, sum(master_df$winner_ioc == i & master_df$winning_surface == 'Grass'))
+  grass_wins_list <- c(grass_wins_list, 
+                       sum(master_df$winner_ioc == i & 
+                           master_df$winning_surface == 'Grass'))
 }
 
 hard_wins_list <- numeric(0)
 for (i in winner_ioc_list) {
-  hard_wins_list <- c(hard_wins_list, sum(master_df$winner_ioc == i & master_df$winning_surface == 'Hard'))
+  hard_wins_list <- c(hard_wins_list, 
+                      sum(master_df$winner_ioc == i & 
+                          master_df$winning_surface == 'Hard'))
 }
 
 
@@ -220,20 +248,33 @@ surface_df <- data.frame(
   Hard = hard_wins_list
 )
 
-# extracting indices required to obtain the top 5 countries from above for a comparison
-row_indices_top5 <- c(which(surface_df$country == 'ESP'), which(surface_df$country == 'SRB'), which(surface_df$country == 'SUI'), which(surface_df$country == 'FRA'), which(surface_df$country == 'USA'))
-
+# extracting indices required to obtain top 5 countries from for comparison
+row_indices_top5 <- c(which(surface_df$country == 'ESP'), 
+                      which(surface_df$country == 'SRB'), 
+                      which(surface_df$country == 'SUI'), 
+                      which(surface_df$country == 'FRA'), 
+                      which(surface_df$country == 'USA'))
 top5_surfaces <- surface_df[row_indices_top5, ]
 top5_surfaces
 
 # plot surfaces information for comparison
-barplot(height = t(as.matrix(top5_surfaces[, 2:4])), names.arg = (top5_names), xpd = F, 
+pdf("../images/top_5_surfaces.pdf")
+a<-dev.cur()
+png(filename = "../images/top_5_surfaces.png")
+dev.control("enable")
+barplot(height = t(as.matrix(top5_surfaces[, 2:4])), 
+        names.arg = (top5_names), 
+        xpd = F, 
         main = "Top 5 country titles by surfaces",
         xlab = "Country", ylab = "Number of titles",
         ylim = c(0, 100), axes = F, 
         col = c(rgb(1, 0 , 0), rgb(0, 1, 0), rgb(0,0, 1)), 
         legend = colnames(top5_surfaces)[-1])
-axis(side = 2, at = seq(from = 0, to = 100, by = 20), tick = TRUE, las = 2)
+axis(side = 2, at = seq(from = 0, to = 100, by = 20), 
+     tick = TRUE, las = 2)
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
 
 ```
 
@@ -249,19 +290,25 @@ unique(master_df$winning_level)
 # construct a dataframe of levels
 A_wins_list <- numeric(0)
 for (i in winner_ioc_list) {
-  A_wins_list <- c(A_wins_list, sum(master_df$winner_ioc == i & master_df$winning_level == 'A'))
+  A_wins_list <- c(A_wins_list, 
+                   sum(master_df$winner_ioc == i & 
+                       master_df$winning_level == 'A'))
 }
 
 
 G_wins_list <- numeric(0)
 for (i in winner_ioc_list) {
-  G_wins_list <- c(G_wins_list, sum(master_df$winner_ioc == i & master_df$winning_level == 'G'))
+  G_wins_list <- c(G_wins_list, 
+                   sum(master_df$winner_ioc == i & 
+                      master_df$winning_level == 'G'))
 }
 
 
 M_wins_list <- numeric(0)
 for (i in winner_ioc_list) {
-  M_wins_list <- c(M_wins_list, sum(master_df$winner_ioc == i & master_df$winning_level == 'M'))
+  M_wins_list <- c(M_wins_list, 
+                   sum(master_df$winner_ioc == i & 
+                       master_df$winning_level == 'M'))
 }
 
 level_df <- data.frame(
@@ -276,14 +323,25 @@ top5_levels <- level_df[row_indices_top5, ]
 top5_levels
 
 # plot for visual comparison
-barplot(height = t(as.matrix(top5_levels[, 2:4])), names.arg = (top5_names), xpd = F, 
+pdf("../images/top_5_level.pdf")
+a<-dev.cur()
+png(filename = "../images/top_5_level.png")
+dev.control("enable")
+barplot(height = t(as.matrix(top5_levels[, 2:4])), 
+        names.arg = (top5_names), 
+        xpd = F, 
         main = "Top 5 country titles by level", 
         xlab = "Country", ylab = "Number of titles",
         ylim = c(0, 70), axes = F, 
-        col = c(rgb(0.8,0.5,0.2), rgb(1, 0.85, 0), rgb(0.75, 0.75, 0.75)), 
+        col = c(rgb(0.8,0.5,0.2), 
+                rgb(1, 0.85, 0), 
+                rgb(0.75, 0.75, 0.75)), 
         legend = colnames(top5_levels)[-1], beside = TRUE)
-axis(side = 2, at = seq(from = 0, to = 70, by = 10), tick = TRUE, las = 2)
-
+axis(side = 2, at = seq(from = 0, to = 70, by = 10), 
+     tick = TRUE, las = 2)
+invisible(dev.copy(which=a))
+invisible(dev.off())
+invisible(dev.off())
 
 
 ```
