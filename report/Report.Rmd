@@ -311,7 +311,7 @@ The overall trend that can be deduced from this data is such that for most count
 We will use the Tennis ATP Rankings from 2015 to determine the competitive depth of a country's tennis representation. First we will read in the data from clean_data directory. We want the top 100 players from each year, and their corresponding country they represent. We have three parts to this analysis. 
 
 Part I was accomplished by manipulating our data first into a table and then into a data frame.
-First we defined depth as a country with more than one player in the top 100. This means the country has more than one representative in the top 100. Then we went even more specific to look at the top 50, top20 and top10. The following table represents each country and the amount of players in each category for 2015. The amount of countries shown is filtered by having at least 2 players represnted in the top 100.
+First we defined depth as a country with more than one player in the top 100. This means the country has more than one representative in the top 100. Then we went even more specific to look at the top 50, top20 and top10. The following table (only showing first 6 rows) represents each country and the amount of players in each category for 2015. The amount of countries shown is filtered by having at least 2 players represnted in the top 100.
 
 ```{r, eval=TRUE, warning= FALSE, message= FALSE, echo = FALSE}
 library("readr")
@@ -421,7 +421,7 @@ final <- data.frame(top100 = all_100,
                     top20 = all_20, 
                     top10 = all_10)
 rownames(final) <- countries
-final
+head(final)
 ```
 
 We created basic bar plots to visualize these categories individually. We will only show top 100 bar graph for this writeup, since these graphs were intermediate for further analysis. Please see /code/analysis_rankings.Rmd for further details of these graphs.  
@@ -486,7 +486,7 @@ for (i in 1:length(rownames(final_before_reshape))) {
 }
 ```
 
-Not only did we find the raw number of players in each category, but we can try to see the weight of each country in the category as well, so we used percentage of players in the groups.  
+From Part I, we can look at our graph “2015 Country Depth” and see that Spain (ESP) was the most dominant, akin the most players in the top 100, and held consistently even in with 2 players in the top 10. Also, France (FRA) had a strong showing, with 10 players in the top 100 and most players (4) in the top 20, and a tied for most players in the top 10 as well. Another thing to note is that Switzerland (SUI) has only 2 players in the top 100, but those 2 players also happen to be in the top 10! Not only did we find the raw number of players in each category, but we can try to see the weight of each country in the category as well, so we used percentage of players in the groups.  
 
 ```{r, eval=TRUE, echo=FALSE, warning= FALSE, message=FALSE}
 
@@ -541,7 +541,7 @@ invisible(dev.off())
 invisible(dev.off())
 ```
 
-From Part I, we can look at our graph “2015 Country Depth” and see that Spain (ESP) was the most dominant, akin the most players in the top 100, and held consistently even in with 2 players in the top 10. Also, France (FRA) had a strong showing, with 10 players in the top 100 and most players (4) in the top 20, and a tied for most players in the top 10 as well. Another thing to note is that Switzerland (SUI) has only 2 players in the top 100, but those 2 players also happen to be in the top 10! We can look at our other graph, “2015 Country Depth by Percentage” to see that indeed, Spain (ESP), France (FRA), and Switzerland (SUI) dominated the top 10. One interesting note is the USA dropped out of the top 10 after a solid showing in the top 100 and top 50.   
+ We can look at our other graph, “2015 Country Depth by Percentage” to see that indeed, Spain (ESP), France (FRA), and Switzerland (SUI) dominated the top 10. One interesting note is the USA dropped out of the top 10 after a solid showing in the top 100 and top 50.   
 
 
 
