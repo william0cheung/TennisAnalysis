@@ -1,0 +1,8 @@
+title: "Metadata"
+author: "William Cheung, Matthew Weglicki"
+date: "Due December 14, 2015"
+
+This file describes the variables, fields, or columns of the raw data. We are scraping from a database online, credit to Jeff Sackmann for providing the data for use. We are using his Github account, https://github.com/JeffSackmann and going through the csv files in https://github.com/JeffSackmann/tennis_atp. 
+
+The player file columns are playerid, firstname, lastname, hand, birthdate, countrycode.
+The columns for the ranking files are rankingdate, ranking, playerid, rankingpoints.

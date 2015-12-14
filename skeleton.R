@@ -1,7 +1,7 @@
 
 # title: "skeleton"
 # author: "Matthew Weglicki, William Cheung"
-# date: "November 18, 2015"
+# date: "Due December 14, 2015"
 # output: creates subdirectories for the project
 
 # Also contains the commands to download raw data files to the corresponding directory

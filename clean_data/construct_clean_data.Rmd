@@ -1,7 +1,7 @@
 ---
-title: "make_clean"
-author: "William Cheung"
-date: "December 6, 2015"
+title: "Cleaning Raw Data"
+author: "Matthew Weglicki, William Cheung"
+date: "Due December 14, 2015"
 output: pdf_document
 ---
 

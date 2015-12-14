@@ -1,7 +1,7 @@
 ---
-title: "retrieve_data"
-author: "William Cheung"
-date: "December 2, 2015"
+title: "Extract Raw Data"
+author: "William Cheung, Matthew Weglicki"
+date: "Due December 14, 2015"
 output: pdf_document
 ---
 
@@ -10,8 +10,6 @@ output: pdf_document
 library("readr")
 
 setwd("../raw_data")
-
-dir.create("./meta_data", recursive = FALSE)
 
 download.file("https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/atp_rankings_current.csv", "rankings_curr.csv")
 rankings_curr <- read_csv("rankings_curr.csv")

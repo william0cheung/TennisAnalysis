@@ -1,7 +1,7 @@
 ---
 title: "Analysis of Tennis Matches"
-author: "Matthew Weglicki"
-date: "December 6, 2015"
+author: "Matthew Weglicki, William Cheung"
+date: "Due December 14, 2015"
 output: pdf_document
 ---
 # DATA ANALYSIS BY MATCHES
@@ -9,7 +9,7 @@ output: pdf_document
 Using our clean data, we will now go on to investigate the dominance of certain countries within men's singles tennis by analyzing all available match statistics since 2010. We will be using the number of titles each country has won since 2010 as a proxy for "dominance". Tennis is also played on three different court surfaces, Clay, Grass and Hard, as well as three different tour "levels", ATP, Masters, and Grandslams, where each level offers a different number of points. Thus after we have collected data on how many titles each country has won, we will proceed to analyze how many of those titles were won on corresponding surfaces and levels, in order to answer the questions of whether some countries are particularly dominant on certain surfaces, or whether they shine on big occasions (ie at tournaments with more points).
 
 ##Part I - Function Creation
-First we must create the functions which when given the match statistics from certain years, are able to extract those matches which were "title matches", where the winner won the entire tournament, and output the winning nationalities, surface, and level of each tournament in that year.  
+First we must create the functions which when given the match statistics from certain years, are able to extract those matches which were "title matches", where the winner won the entire tournament, and output the winning nationalities, surface, and level of each tournament in that year. We will import the "reader" library to read in the data from our "clean_data."
 
 ```{r, eval=TRUE, tidy=TRUE}
 

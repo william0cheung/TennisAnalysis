@@ -1,7 +1,7 @@
 ---
 title: "Analysis of Tennis Rankings"
-author: "William Cheung"
-date: "December 9, 2015"
+author: "William Cheung, Matthew Weglicki"
+date: "Due December 14, 2015"
 output: pdf_document
 ---
 # DATA ANALYSIS BY RANKINGS
@@ -12,6 +12,8 @@ We will use the Tennis ATP Rankings from 2015 to determine the competitive depth
 In Part I we will analyze at the rankings for 2015, looking for a country's depth of players. 
 In Part II we will analyze the evolution of rankings over the years from 2010 to 2015.
 In Part III we will analyze the average amount of weight a player countributes to his country from 2015 stats.
+We will import the "reader" library to read in the data from our "clean_data." We will also import the library of "reshape" and "ggplot" to assist in creating our plots.
+
 ```{r, eval=TRUE, warning= FALSE, message= FALSE}
 library("readr")
 setwd("../code")
